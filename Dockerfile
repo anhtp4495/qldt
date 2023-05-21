@@ -7,7 +7,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["CNTT129_NetCore.csproj", "CNTT129_NetCore/"]
+COPY ["CNTT129_NetCore/CNTT129_NetCore.csproj", "CNTT129_NetCore/"]
 RUN dotnet restore "CNTT129_NetCore/CNTT129_NetCore.csproj"
 COPY . .
 WORKDIR "/src/CNTT129_NetCore"
