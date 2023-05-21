@@ -1,0 +1,52 @@
+﻿@{
+    ViewBag.Title = "TinTuc";
+    Layout = "~/Views/Shared/_Layout_SinhVien.cshtml";
+}
+@*@model PagedList.IPagedList<CNTT129.Models.HOATDONG>
+@using PagedList.Mvc;*@
+@using CNTT129.Models;
+<div class="row mt-2">
+    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2"></div>
+    <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="w-100 text-center">
+                    DANH SÁCH HOẠT ĐỘNG
+                </div>
+                @{
+                    foreach (var item in Model)
+                    {
+                        DateTime date2 = DateTime.Parse(item.NGAYDUYET);
+                        var ngayduyet = date2.ToString("dd/MM/yyyy");
+                        string[] list_img = item.HINHANH.Split(new char[] { ',' });
+                        var hinh = list_img[0] == "" ? "news.png" : list_img[0];
+                        <div class="row mt-2">
+                            <div class="col-3">
+                                <img style="width:80px;height:80px" src="~/IMG/@hinh" />
+                            </div>
+                            <div class="col-9">
+                                <div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                    <a href="/SinhVien/ChiTietHoatDong/?idhd=@item.IDHD.ToString()" style="color: black;font-size:14px">@item.TIEUDE</a>
+                                </div>
+                                <div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;height:45px">
+                                    @item.NOIDUNG
+                                </div>
+                                <div class="w-100 text-right" style="color:red;font-weight:600;opacity:0.7;font-size:11px">@ngayduyet</div>
+                            </div>
+                        </div>
+                    }
+                }
+                <div style="color: white; text-align: center">
+                    <p>Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)/@Model.PageCount</p>
+                    <div class="pagination" style="color: black">
+                        @*@Html.PagedListPager(Model, Page => Url.Action("/TinTuc", new { Page }), new PagedListRenderOptions
+               {
+                   LiElementClasses = new List<string> { "page-item", "page-link" }
+               })*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2"></div>
+</div>

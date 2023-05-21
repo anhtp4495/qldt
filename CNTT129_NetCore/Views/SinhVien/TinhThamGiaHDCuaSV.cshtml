@@ -1,0 +1,499 @@
+﻿@{
+    ViewBag.Title = "TinhThamGiaHDCuaSV";
+    Layout = "~/Views/Shared/_Layout_SinhVien.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string id_sv = HttpContextAccessor.HttpContext.Session.Get<string>("id_sv");
+
+    HOATDONG hoatdong = new HOATDONG();
+
+    List<HOATDONG> listHD = new List<HOATDONG>();
+    listHD = hoatdong.findBy(2);
+
+    HOCKY hocky = new HOCKY();
+    var menu_hocky = hocky.find2();
+
+
+    DANGKY dang_ky = new DANGKY();
+    DIEMDANH diem_danh = new DIEMDANH();
+
+    DateTime ngay_ht = DateTime.Today;
+    var dateht = ngay_ht.ToString("dd/MM/yyyy");
+}
+<div class="card">
+    <div class="card-body">
+        <div class="text-center w-100">
+            <h2>TÌNH HÌNH THAM GIA HOẠT ĐỘNG</h2>
+        </div>
+        <div class="col-3">
+            Học kỳ
+            <select class="form-select" style="height:35px;width:100%" onchange="changeHd()" id="hk">
+                <option value="">Chọn học kỳ</option>
+                @{
+                    foreach (var item in menu_hocky)
+                    {
+                        <option value="@item.IDHK">@item.TENHK</option>
+                    }
+                }
+            </select>
+        </div>
+        <div id="list">
+            <div class="text-center w-100 mt-3" style="border-left: 5px inset #ff6a00">
+                <h5>DANH SÁCH HOẠT ĐỘNG ĐÃ ĐĂNG KÝ</h5>
+            </div>
+            <div style="overflow-y:auto">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="bg-primary" style="color:white;">
+                            <td>STT</td>
+                            <td>MÃ HĐ</td>
+                            <td>TÊN HĐ</td>
+                            <td>NGÀY BĐ ĐĂNG KÝ</td>
+                            <td>NGÀY KT ĐĂNG KÝ</td>
+                            <td>NGÀY BẮT ĐẦU</td>
+                            <td>HỌC KỲ</td>
+                            <td>THAO TÁC</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (ViewData["list_dang_ky"] != null)
+                            {
+                                var i = 1;
+                                foreach (var item in ViewData["list_dang_ky"] as List<DANGKY>)
+                                {
+                                    DateTime NGAYDANGKY = DateTime.Parse(item.NGAYDANGKY);
+                                    DateTime NGAYKETTHUC = DateTime.Parse(item.NGAYKETTHUC);
+                                    var ngaykt = NGAYKETTHUC.ToString("dd/MM/yyyy");
+                                    var ngaydk = NGAYDANGKY.ToString("dd/MM/yyyy");
+                                    DateTime NGAYBATDAU = DateTime.Parse(item.NGAYBATDAU);
+                                    var ngdb = NGAYBATDAU.ToString("dd/MM/yyyy");
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@item.MAHD</td>
+                                        <td>@item.TIEUDE</td>
+                                        <td>@ngaydk</td>
+                                        <td>@ngaykt</td>
+                                        <td>
+                                            @{
+                                    if (item.LOAI_BUOI == "1")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Sáng (7h-11h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "2")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Chiều (13h-17h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "3")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Tối (18h-22h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "0")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Cả ngày @ngdb</span>
+                                        </label>
+                                    }
+                                            }
+                                        </td>
+                                        <td style="width:10%">@item.TENHK</td>
+                                        <td style="width:10%">
+                                            @{
+                                    if (item.TRANGTHAI == "0" && NGAYKETTHUC >= ngay_ht)
+                                    {
+                                        <button type="button" class="btn btn-danger" onclick="huyHd(@item.IDDK)">Hủy</button>
+                                    }
+                                            }
+
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        Bạn chưa đăng ký hoạt động
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center w-100 mt-3" style="border-left: 5px inset #ff6a00">
+                <h5>DANH SÁCH HOẠT ĐỘNG ĐÃ THAM GIA</h5>
+            </div>
+            <div style="overflow-y:auto">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="bg-primary" style="color:white;">
+                            <td>STT</td>
+                            <td>MÃ HĐ</td>
+                            <td>TÊN HĐ</td>
+                            <td>NGÀY THAM GIA</td>
+                            <td>NGÀY BẮT ĐẦU</td>
+                            <td>TÊN HK</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (ViewData["list_sv_diem_danh"] != null)
+                            {
+                                var i = 1;
+                                foreach (var item in ViewData["list_sv_diem_danh"] as List<DIEMDANH>)
+                                {
+                                    DateTime NGAYDIEMDANH = DateTime.Parse(item.NGAYDIEMDANH);
+                                    var ngdd = NGAYDIEMDANH.ToString("dd/MM/yyyy");
+                                    DateTime NGAYBATDAU = DateTime.Parse(item.NGAYBATDAU);
+                                    var ngdb = NGAYBATDAU.ToString("dd/MM/yyyy");
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@item.MAHD</td>
+                                        <td>@item.TIEUDE</td>
+                                        <td>@ngdd</td>
+                                        <td>
+                                            @{
+                                    if (item.LOAI_BUOI == "1")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Sáng (7h-11h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "2")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Chiều (13h-17h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "3")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Tối (18h-22h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "0")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Cả ngày @ngdb</span>
+                                        </label>
+                                    }
+                                            }
+                                        </td>
+                                        <td style="width:10%">@item.TENHK</td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        Bạn chưa tham gia hoạt động
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center w-100 mt-3" style="border-left: 5px inset #ff6a00">
+                <h5>DANH SÁCH HOẠT ĐỘNG ĐÃ HỦY</h5>
+            </div>
+            <div style="overflow-y:auto">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="bg-primary" style="color:white;">
+                            <td>STT</td>
+                            <td>MÃ HĐ</td>
+                            <td>TÊN HĐ</td>
+                            <td>NGÀY ĐĂNG KÝ</td>
+                            <td>NGÀY KT ĐĂNG KÝ</td>
+                            <td>NGÀY BẮT ĐẦU</td>
+                            <td>NGÀY HỦY</td>
+                            <td>HỌC KỲ</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (ViewData["list_sv_huy"] != null)
+                            {
+                                var i = 1;
+                                foreach (var item in ViewData["list_sv_huy"] as List<DANGKY>)
+                                {
+                                    DateTime NGAYDANGKY = DateTime.Parse(item.NGAYDANGKY);
+                                    DateTime NGAYKETTHUC = DateTime.Parse(item.NGAYKETTHUC);
+                                    DateTime NGAYHUY = DateTime.Parse(item.NGAYHUY);
+                                    var ngayhuy = NGAYHUY.ToString("dd/MM/yyyy");
+                                    var ngaykt = NGAYKETTHUC.ToString("dd/MM/yyyy");
+                                    var ngaydk = NGAYDANGKY.ToString("dd/MM/yyyy");
+                                    DateTime NGAYBATDAU = DateTime.Parse(item.NGAYBATDAU);
+                                    var ngdb = NGAYBATDAU.ToString("dd/MM/yyyy");
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@item.MAHD</td>
+                                        <td>@item.TIEUDE</td>
+                                        <td>@ngaydk</td>
+                                        <td>@ngaykt</td>
+                                        <td>
+                                            @{
+                                    if (item.LOAI_BUOI == "1")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Sáng (7h-11h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "2")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Chiều (13h-17h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "3")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Tối (18h-22h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "0")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Cả ngày @ngdb</span>
+                                        </label>
+                                    }
+                                            }
+                                        </td>
+                                        <td>@ngayhuy</td>
+                                        <td style="width:10%">@item.TENHK</td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        Bạn chưa hủy hoạt động
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center w-100 mt-3" style="border-left: 5px inset #ff6a00">
+                <h5>DANH SÁCH HOẠT ĐỘNG KHÔNG THAM GIA</h5>
+            </div>
+            <div style="overflow-y:auto">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="bg-primary" style="color:white;">
+                            <td>STT</td>
+                            <td>MÃ HĐ</td>
+                            <td>TÊN HĐ</td>
+                            <td>NGÀY ĐĂNG KÝ</td>
+                            <td>NGÀY KT ĐĂNG KÝ</td>
+                            <td>NGÀY BẮT ĐẦU</td>
+                            <td>NGÀY HỦY</td>
+                            <td>HỌC KỲ</td>
+                            <td>THAO TÁC</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (ViewData["list_khong_tham_gia"] != null)
+                            {
+                                var i = 1;
+                                foreach (var item in ViewData["list_khong_tham_gia"] as List<DANGKY>)
+                                {
+                                    DateTime NGAYDANGKY = DateTime.Parse(item.NGAYDANGKY);
+                                    DateTime NGAYKETTHUC = DateTime.Parse(item.NGAYKETTHUC);
+                                    DateTime NGAYHUY = DateTime.Parse(item.NGAYHUY);
+                                    var ngayhuy = NGAYHUY.ToString("dd/MM/yyyy");
+                                    var ngaykt = NGAYKETTHUC.ToString("dd/MM/yyyy");
+                                    var ngaydk = NGAYDANGKY.ToString("dd/MM/yyyy");
+                                    DateTime NGAYBATDAU = DateTime.Parse(item.NGAYBATDAU);
+                                    var ngdb = NGAYBATDAU.ToString("dd/MM/yyyy");
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@item.MAHD</td>
+                                        <td>@item.TIEUDE</td>
+                                        <td>@ngaydk</td>
+                                        <td>@ngaykt</td>
+                                        <td>
+                                            @{
+                                    if (item.LOAI_BUOI == "1")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Sáng (7h-11h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "2")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Chiều (13h-17h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "3")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Tối (18h-22h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "0")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Cả ngày @ngdb</span>
+                                        </label>
+                                    }
+                                            }
+                                        </td>
+                                        <td>@ngayhuy</td>
+                                        <td style="width:10%">@item.TENHK</td>
+                                        <td style="width:10%">
+                                            @{
+                                    if (item.TRANGTHAI == "0" && NGAYKETTHUC >= ngay_ht)
+                                    {
+                                        <button type="button" class="btn btn-danger" onclick="huyHd(@item.IDBUOI,@id_sv)">Hủy</button>
+                                    }
+                                            }
+
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        Bạn không bỏ lỡ hoạt động
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center w-100 mt-3" style="border-left: 5px inset #ff6a00">
+                <h5>DANH SÁCH HOẠT ĐỘNG KHÔNG DIỄN RA, KHÔNG ĐỦ ĐIỀU KIỆN ĐỂ THAM GIA</h5>
+            </div>
+            <div style="overflow-y:auto">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="bg-primary" style="color:white;">
+                            <td>STT</td>
+                            <td>MÃ HĐ</td>
+                            <td>TÊN HĐ</td>
+                            <td>NGÀY ĐĂNG KÝ</td>
+                            <td>NGÀY KT ĐĂNG KÝ</td>
+                            <td>NGÀY BẮT ĐẦU</td>
+                            <td>NGÀY HỦY</td>
+                            <td>HỌC KỲ</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (ViewData["list_ds_hd_huy"] != null)
+                            {
+                                var i = 1;
+                                foreach (var item in ViewData["list_ds_hd_huy"] as List<DANGKY>)
+                                {
+                                    DateTime NGAYDANGKY = DateTime.Parse(item.NGAYDANGKY);
+                                    DateTime NGAYKETTHUC = DateTime.Parse(item.NGAYKETTHUC);
+                                    DateTime NGAYHUY = DateTime.Parse(item.NGAYHUY);
+                                    var ngayhuy = NGAYHUY.ToString("dd/MM/yyyy");
+                                    var ngaykt = NGAYKETTHUC.ToString("dd/MM/yyyy");
+                                    var ngaydk = NGAYDANGKY.ToString("dd/MM/yyyy");
+                                    DateTime NGAYBATDAU = DateTime.Parse(item.NGAYBATDAU);
+                                    var ngdb = NGAYBATDAU.ToString("dd/MM/yyyy");
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@item.MAHD</td>
+                                        <td>@item.TIEUDE</td>
+                                        <td>@ngaydk</td>
+                                        <td>@ngaykt</td>
+                                        <td>
+                                            @{
+                                    if (item.LOAI_BUOI == "1")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Sáng (7h-11h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "2")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Chiều (13h-17h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "3")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Tối (18h-22h) @ngdb</span>
+                                        </label>
+                                    }
+                                    if (item.LOAI_BUOI == "0")
+                                    {
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            <span>Cả ngày @ngdb</span>
+                                        </label>
+                                    }
+                                            }
+                                        </td>
+                                        <td>@ngayhuy</td>
+                                        <td style="width:10%">@item.TENHK</td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        Nhà trường chưa hủy hoạt động
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function changeHd() {
+        var id_hk = document.getElementById("hk").value;
+        $.ajax({
+            url: '/SinhVien/layDanhSachTinhTrangThamGiaHDSV',
+            data: { id_hk: id_hk,id_sv: @id_sv },
+            type: 'POST',
+            success: function (data) {
+                $("#list").html(data);
+            }
+        });
+    }
+    function huyHd(iddk) {
+        var id_hk = document.getElementById("hk").value;
+        $.ajax({
+            url: '/SinhVien/huyHDSV',
+            data: { id_hk: id_hk,id_sv: @id_sv,iddk: iddk },
+            type: 'POST',
+            success: function (data) {
+                $("#list").html(data);
+            }
+        });
+    }
+</script>

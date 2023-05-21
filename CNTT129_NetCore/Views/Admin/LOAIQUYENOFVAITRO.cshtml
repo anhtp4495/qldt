@@ -1,0 +1,141 @@
+﻿@{
+    ViewBag.Title = "LOAIQYENOFVAITRO";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using CNTT129.Models;
+@{
+    LOAIQUYENOFVAITRO sp = new LOAIQUYENOFVAITRO();
+    var ma = ViewBag.ID_VAI_TRO;
+}
+<button type="button" class="btn btn-outline-danger a" data-toggle="modal" onclick="luu('@ma')">
+    Lưu
+</button>
+<div class="row">
+    <div class="col-xl-6">
+        <h1>LOẠI QUYỀN CÓ TRONG VAI TRÒ</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td></td>
+                    <td>Mã</td>
+                    <td>Tên</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var menu = sp.getDSDaCo(ma);
+                    if (menu.Count > 0)
+                    {
+                        foreach (var item in menu)
+                        {
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="chkyes" checked="checked" data-id="@item.ID"/></td>
+                        <td>@item.Ma</td>
+                        <td>@item.Ten</td>
+                    </tr> 
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-xl-6">
+        <h1>LOẠI QUYỀN CHƯA CÓ TRONG VAI TRÒ</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td></td>
+                    <td>Mã</td>
+                    <td>Tên</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var menu2 = sp.getDSDaXoa(ma);
+                    if (menu2.Count > 0)
+                    {
+                        foreach (var item in menu2)
+                        {
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="chkbo" data-id="@item.ID"/></td>
+                        <td>@item.Ma</td>
+                        <td>@item.Ten</td>
+                    </tr> 
+                        }
+                    }
+                }   
+                @{
+                    var menu3 = sp.getDSChuaCo(ma);
+                    if (menu3.Count >0)
+                    {
+                        foreach (var item in menu3)
+                        {
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="chkthem" data-id="@item.ID"/></td>
+                        <td>@item.Ma</td>
+                        <td>@item.Ten</td>
+                    </tr> 
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function luu(id) {
+        var listSpCo = $('.chkyes');
+        var listCo = [];
+        $.each(listSpCo, function (i, item) {
+            if (item.checked == false) {
+                listCo.push(
+                   $(item).data('id')
+                );
+            }
+        });
+        var listSpBo = $('.chkbo');
+        var listBo = [];
+        $.each(listSpBo, function (i, item) {
+            if (item.checked == true) {
+                listBo.push(
+                    $(item).data('id')
+                );
+            }
+        });
+        var listSpThem = $('.chkthem');
+        var listThem = [];
+        $.each(listSpThem, function (i, item) {
+            if (item.checked == true) {
+                listThem.push(
+                    $(item).data('id')
+                );
+            }
+        });
+        var dataList = [];
+        var data = {
+            listThem: listThem,
+            listBo: listBo,
+            listCo: listCo,
+            id: id,
+        };
+        dataList.push(data);
+        if (listCo.length == 0 && listThem.length == 0 && listBo.length == 0) {
+            return;
+        }
+        $.ajax({
+            url: '/Admin/CNLOAIQUYENOFVAITRO',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.status == true) {
+                    window.location.href = "/Admin/LOAIQUYENOFVAITRO/" + id;
+                }
+            }
+        })
+    }
+</script>
+

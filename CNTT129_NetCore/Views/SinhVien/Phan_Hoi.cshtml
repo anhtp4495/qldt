@@ -1,0 +1,243 @@
+﻿@{
+    ViewBag.Title = "Phan_Hoi";
+    Layout = "~/Views/Shared/_Layout_SinhVien.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string id_sv = HttpContextAccessor.HttpContext.Session.Get<string>("id_sv");
+    HOATDONG hoatdong = new HOATDONG();
+    HoatDongBuoi hdb = new HoatDongBuoi();
+    List<HoatDongBuoi> listDate = new List<HoatDongBuoi>();
+    listDate = hdb.findByID(ViewBag.id_hd);
+    SINHVIEN sv = new SINHVIEN();
+    List<SINHVIEN> listSv = new List<SINHVIEN>();
+    listSv = sv.findByID2(int.Parse(id_sv));
+
+    List<HOATDONG> listHD = new List<HOATDONG>();
+    listHD = hoatdong.findBy(5);
+
+    DANGKY dk = new DANGKY();
+}
+<div class="row mt-2">
+    <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+    </div>
+    <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+        <div class="card">
+            <div class="card-body">
+                <h6 style="text-transform:uppercase">Phản hồi sinh viên</h6>
+                <hr />
+                <div style="margin-left:10px;margin-bottom:10px">
+                    @{
+                        foreach (var item in listSv)
+                        {
+                            <div class="w-100 mt-1">
+                                <div class="row">
+                                    <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                                        <label>Mã sinh viên</label>
+                                    </div>
+                                    <div class="col-md-6 col-lg-6 col-xl-6 col-sm-6">
+                                        <span style="font-weight:800" id="masv">@item.MASV</span><br />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-100 mt-1">
+                                <div class="row">
+                                    <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                                        <label>Họ và tên</label><br />
+                                    </div>
+                                    <div class="col-md-6 col-lg-6 col-xl-6 col-sm-6">
+                                        <span style="font-weight:800">@item.TENSV</span><br />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-100 mt-1">
+                                <div class="row">
+                                    <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                                        <label>Email</label><br />
+                                    </div>
+                                    <div class="col-md-6 col-lg-6 col-xl-6 col-sm-6">
+                                        <span style="font-weight:800">@item.email</span><br />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-100 mt-1">
+                                <div class="row">
+                                    <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                                        <label>Điện thoại</label><br />
+                                    </div>
+                                    <div class="col-md-6 col-lg-6 col-xl-6 col-sm-6">
+                                        <span style="font-weight:800">@item.SDT</span><br />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    <div class="w-100 mt-1">
+                        <div class="row">
+                            <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                                <label>Tiêu đề</label><br />
+                            </div>
+                            <div class="col-md-9 col-lg-9 col-xl-9 col-sm-9">
+                                <input class="form-control form-control-sm" id="tieu_de" name="tieu_de" placeholder="Nhập tiêu đề" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100 mt-1">
+                        <div class="row">
+                            <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                                <label>Loại</label><br />
+                            </div>
+                            <div class="col-md-9 col-lg-9 col-xl-9 col-sm-9">
+                                <select class="form-select" style="height:35px;width:100%" onchange="changeLoai()" id="loai">
+                                    <option value="">Chọn loại phản hồi</option>
+                                    <option value="1">Phản hồi hoạt động</option>
+                                    <option value="2">Phản hồi quy phạm</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100 mt-1">
+                        <div class="row" id="tb_hoat_dong">
+                            <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                                <label>Hoạt động/ Quy phạm</label><br />
+                            </div>
+                            <div class="col-md-9 col-lg-9 col-xl-9 col-sm-9">
+                                <select class="form-select" style="height:35px;width:100%" id="hoat_dong" disabled="disabled">
+                                    <option value="">Chọn loại hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100 mt-1">
+                        <div class="row">
+                            <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                                <label>Nội dung</label><br />
+                            </div>
+                            <div class="col-md-9 col-lg-9 col-xl-9 col-sm-9">
+                                <textarea class="form-control form-control-sm" style="height:250px" id="loi_nhan"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100 mt-1">
+                        <div class="row">
+                            <div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+                            </div>
+                            <div class="col-md-9 col-lg-9 col-xl-9 col-sm-9">
+                                <input id="input-25" name="" class="form-control form-control-sm" type="file" multiple>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100 text-center mt-2">
+                        <div>
+                            @{
+                                var idsv = id_sv;
+                            }
+                            <span id='dialog-err' class='error-msg'></span>
+                            <button type="button" class="btn btn-success" onclick="save(@idsv)">GỬI THÔNG TIN</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function changeLoai() {
+        var loai = document.getElementById("loai").value;
+        if (loai == "") {
+            document.getElementById("hoat_dong").disabled = true;
+            $("#hoat_dong").val("").change();
+        } else if(loai == "1"){
+            document.getElementById("hoat_dong").disabled = false;
+            $.ajax({
+                url: '/SinhVien/ChangeLoaiPhanHoi',
+                data: { loai: loai,id_sv: @id_sv },
+                type: 'POST',
+                success: function (data) {
+                    $("#tb_hoat_dong").html(data);
+                }
+            });
+        } else {
+            document.getElementById("hoat_dong").disabled = false;
+            $.ajax({
+                url: '/SinhVien/ChangeLoaiPhanHoi',
+                data: { loai: loai,id_sv: @id_sv },
+                type: 'POST',
+                success: function (data) {
+                    $("#tb_hoat_dong").html(data);
+                }
+            });
+        }
+    }
+    function save(idsv) {
+        $('#dialog-err').text("");
+        if ($("#tieu_de").val() == "" || $("#loi_nhan").val() == "") {
+            $('#dialog-err').text('Vui lòng điền đủ thông tin');
+            return;
+        }
+
+        if ( $("#loai").val() == "") {
+            $('#dialog-err').text('Vui lòng chọn loại phản hồi');
+            return;
+        }
+
+        if ( $("#hoat_dong").val() == "") {
+            $('#dialog-err').text('Vui lòng chọn một hoạt động hoặc một quy phạm');
+            return;
+        }
+        var formData = new FormData();
+        if (formData != undefined) {
+            var fileUpload = $("#input-25")[0].files;
+            if (fileUpload.length == 0) {
+                $('#dialog-err').text('Vui lòng chọn một tệp');
+                return;
+            }
+            var dataImg = [];
+            for (var i = 0; i < fileUpload.length; i++) {
+                dataImg.push(fileUpload[i].name);
+                formData.append("file", fileUpload[i]);
+            }
+        }
+        var dateTao = new Date()
+        var dataList = [];
+        var data = {
+            tieu_de:  $("#tieu_de").val(),
+            loai:  $("#loai").val(),
+            hoat_dong:  $("#hoat_dong").val(),
+            loi_nhan:  $("#loi_nhan").val(),
+            idsv: idsv+"",
+            tep: dataImg.join(","),
+            ngay_tao: dateTao.getFullYear() + '/' + (dateTao.getMonth() + 1) + '/' + dateTao.getDate(),
+        }
+        dataList.push(data);
+        $.ajax({
+            url: '/SinhVien/savePhanHoi',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                }
+                else {
+                    $.ajax({
+                        url: "/SinhVien/UploadFiles",
+                        method: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                        },
+                        error: function (data) {
+                        }
+                    })
+                    location.reload();
+                }
+            }
+        })
+    }
+</script>

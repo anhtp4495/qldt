@@ -1,0 +1,279 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/StyleSheet1.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet prefetch" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css">
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+</head>
+@using System.IO;
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    HOATDONG hoatdong = new HOATDONG();
+    hoatdong.khoaFormDangKyAll();
+    hoatdong.khoaFormDiemDanhAll();
+
+    DANGKY dangky = new DANGKY();
+    dangky.capnhatKhongThamGia();
+
+    HoatDongBuoi hdb = new HoatDongBuoi();
+    hdb.updateTTHdb();
+    
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+
+    string Ten_gv = HttpContextAccessor.HttpContext.Session.Get<string>("Ten_gv");
+    string name_vt = HttpContextAccessor.HttpContext.Session.Get<string>("name_vt");
+    string gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+}
+<body>
+    <div class="page-wrapper chiller-theme toggled">
+        <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
+            <i class="fas fa-bars"></i>
+        </a>
+        <nav id="sidebar" class="sidebar-wrapper">
+            <div class="sidebar-content">
+                <div class="sidebar-brand">
+                    <a>HUFI</a>
+                    <div id="close-sidebar">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+                <div class="sidebar-header">
+                    <div class="user-pic">
+                        <img class="img-responsive img-rounded" src="http://via.placeholder.com/160x160"
+                             alt="User picture">
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">
+                            @Ten_gv
+                        </span>
+                        <span class="user-role">@name_vt</span>
+                        <span class="user-status">
+                            <i class="fa fa-circle"></i>
+                            <span>Online</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul>
+                        @{
+                            if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_quan_tri") == 1 || gvID.Equals("1"))
+                            {
+                                <li class="sidebar-dropdown">
+                                    <a>
+                                        <i class="fa fa-th-large"></i>
+                                        <span>QUẢN TRỊ</span>
+                                        @*<span class="badge badge-pill badge-warning">New</span>*@
+                                    </a>
+                                    <div class="sidebar-submenu">
+                                        <ul>
+                                            @{
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_gv") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/GIANGVIEN">DANH MỤC GIẢNG VIÊN</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_sv") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/SINHVIEN">DANH MỤC SINH VIÊN</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_vt") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/VAITRO">DANH MỤC VAI TRÒ GIẢNG VIÊN</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_vt_sv") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/VAITROSV">DANH MỤC VAI TRÒ SINH VIÊN</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_khoa") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/KHOA">DANH MỤC ĐƠN VỊ</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_quyen") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/LOAIQUYEN">DANH MỤC LOẠI QUYỀN</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_hd_ngoai") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/LoaiHdNgoai">DANH MỤC LOẠI HOẠT ĐỘNG NGOÀI</a></li>
+                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                </li>
+                            }
+
+                        }
+                        @{
+                            if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_hd") == 1 || gvID.Equals("1"))
+                            {
+                                <li class="sidebar-dropdown">
+                                    <a>
+                                        <i class="fa fa-sign-language"></i>
+                                        <span>HOẠT ĐỘNG</span>
+                                        @*<span class="badge badge-pill badge-danger">3</span>*@
+                                    </a>
+                                    <div class="sidebar-submenu">
+                                        <ul>
+                                            <li class=""><a href="/Admin/ThemHoatDong">THÊM MỚI HOẠT ĐỘNG</a></li>
+                                            @{
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_tong_ket_hd") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/TongKetHoatDong">TỔNG KẾT HOẠT ĐỘNG</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_sach_hd_ngoai") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/HOATDONGNGOAI">DANH SÁCH HOẠT ĐỘNG NGOÀI</a></li>
+                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        @{
+                            if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_nq") == 1 || gvID.Equals("1"))
+                            {
+                                <li class="sidebar-dropdown">
+                                    <a>
+                                        <i class="far fa-gem"></i>
+                                        <span>NỘI QUY- VI PHẠM- PHẢN HỒI</span>
+                                    </a>
+                                    <div class="sidebar-submenu">
+                                        <ul>
+                                            @{
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_nq2") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/NOIQUY">DANH MỤC NỘI QUY</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "them_moi_vp") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/ThemMoiViPham">THÊM MỚI VI PHẠM</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_vp") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/DanhSachViPham">DANH SÁCH VI PHẠM</a></li>
+                                }
+                                if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_ph") == 1 || gvID.Equals("1"))
+                                {
+                                    <li class=""><a href="/Admin/DanhSachPhanHoi">DANH SÁCH PHẢN HỒI</a></li>
+                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        @{
+                            if (quyen.getDataQuyenGV(gvID, "xem_danh_muc_kq") == 1 || gvID.Equals("1"))
+                            {
+                                <li class="sidebar-dropdown">
+                                    <a>
+                                        <i class="fa fa-chart-line"></i>
+                                        <span>KẾT QUẢ</span>
+                                    </a>
+                                    <div class="sidebar-submenu">
+                                        <ul>
+                                            <li class=""><a href="/Admin/ChotKetQua">CHỐT ĐIỂM</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+                <!-- sidebar-menu  -->
+            </div>
+            <!-- sidebar-content  -->
+            <div class="sidebar-footer">
+                @*<a href="#">
+                    <i class="fa fa-bell"></i>
+                    <span class="badge badge-pill badge-warning notification">3</span>
+                </a>*@
+                @*<a href="#">
+                        <i class="fa fa-envelope"></i>
+                        <span class="badge badge-pill badge-success notification">7</span>
+                    </a>*@
+                @*<a href="#">
+                        <i class="fa fa-cog"></i>
+                        <span class="badge-sonar"></span>
+                    </a>*@
+                <a href="/Admin/DangXuat">
+                    <i class="fa fa-power-off"></i>
+                </a>
+            </div>
+        </nav>
+        <!-- sidebar-wrapper  -->
+        <main class="page-content">
+            <div class="container-fluid">
+                @RenderBody()
+                <footer class="text-center">
+                    <div class="mb-2">
+                        <small>
+                            © 2022 made with <i class="fa fa-heart" style="color:red"></i> by - <a target="_blank" rel="noopener noreferrer" href="#">
+                                CNTT129
+                            </a>
+                        </small>
+                    </div>
+                </footer>
+            </div>
+        </main>
+        <!-- page-content" -->
+    </div>
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+    <script src="~/Scripts/js_file.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    <script type="text/javascript">
+        jQuery(function ($) {
+
+            $(".sidebar-dropdown > a").click(function () {
+                $(".sidebar-submenu").slideUp(200);
+                if (
+                  $(this)
+                    .parent()
+                    .hasClass("active")
+                ) {
+                    $(".sidebar-dropdown").removeClass("active");
+                    $(this)
+                      .parent()
+                      .removeClass("active");
+                } else {
+                    $(".sidebar-dropdown").removeClass("active");
+                    $(this)
+                      .next(".sidebar-submenu")
+                      .slideDown(200);
+                    $(this)
+                      .parent()
+                      .addClass("active");
+                }
+            });
+
+            $("#close-sidebar").click(function () {
+                $(".page-wrapper").removeClass("toggled");
+            });
+            $("#show-sidebar").click(function () {
+                $(".page-wrapper").addClass("toggled");
+            });
+        });
+    </script>
+</body>
+</html>

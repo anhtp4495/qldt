@@ -1,0 +1,136 @@
+﻿@{
+    ViewBag.Title = "ThemMoiViPham";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string Ten_gv = HttpContextAccessor.HttpContext.Session.Get<string>("Ten_gv");
+    string ma_gv = HttpContextAccessor.HttpContext.Session.Get<string>("ma_gv");
+    NOI_QUY noi_quy = new NOI_QUY();
+    SINHVIEN sinh_vien = new SINHVIEN();
+}
+<div class="border-bottom-0">
+    <ul class="nav nav-tabs" id="">
+        <li class="nav-item">
+            <a id="tab-1" class="nav-link active" href="/Admin/ThemMoiViPham">Thêm mới vi phạm</a>
+        </li>
+    </ul>
+</div>
+<div class="row mt-2">
+    <div class="col-1">
+        Mã vi phạm
+    </div>
+    <div class="col-4">
+        <input placeholder="Mã tự động tạo" disabled class="form-control" />
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-1">
+        Tiêu đề vi phạm
+    </div>
+    <div class="col-4">
+        <input id="tieu_de" placeholder="Nhập tiêu đề" class="form-control" />
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-1">
+        Người tạo
+    </div>
+    <div class="col-4">
+        <label style="font-weight: 100; color: red">@Ten_gv - @ma_gv</label>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-1">
+        Nội dung
+    </div>
+    <div class="col-4">
+        <textarea id="noi_dung" style="height:240px" class="form-control"></textarea>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-1">
+        Nội quy
+    </div>
+    <div class="col-4">
+        <select id="noi_quy" class="form-control">
+            <option value="">Chọn nội quy</option>
+            @{
+                foreach (var item in noi_quy.find("", "", "0"))
+                {
+                    <option value="@item.ID_NOI_QUY">@item.TEN_NOI_QUY</option>
+                }
+            }
+        </select>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-1">
+        Sinh viên
+    </div>
+    <div class="col-4">
+        <select id="sinh_vien" class="form-control select2" multiple>
+            @{
+                foreach (var item in sinh_vien.find("0"))
+                {
+                    <option value="@item.ID_SV">@item.MASV - @item.TENSV</option>
+                }
+            }
+        </select>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-4 text-right">
+        <span id='dialog-err' class='error-msg'></span>
+    </div>
+    <div class="col-1 text-right">
+        <button type="button" class="btn btn-primary" name="save" value="save" id="save" onclick="save()">Lưu</button>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+    function save() {
+        var dateTao = new Date();
+        if ($("#tieu_de").val() == "" || $("#noi_dung").val() == "" ) {
+            $('#dialog-err').text('Vui lòng nhập đầy đủ thông tin');
+            return;
+        }
+
+        if ($("#noi_quy").val() == "") {
+            $('#dialog-err').text('Vui lòng chọn nội quy');
+            return;
+        }
+        if ($("#sinh_vien").val().length == 0) {
+            $('#dialog-err').text('Vui lòng chọn sinh viên');
+            return;
+        }
+        var dataList = [];
+        var data = {
+            tieu_de: $('#tieu_de').val(),
+            noi_dung: $('#noi_dung').val(),
+            noi_quy: $('#noi_quy').val(),
+            sinh_vien: $('#sinh_vien').val(),
+            ngay_tao: dateTao.getFullYear() + '/' + (dateTao.getMonth() + 1) + '/' + dateTao.getDate(),
+        }
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/saveViPham',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                }
+                else {
+                    location.reload();
+                }
+            }
+        })
+    }
+</script>

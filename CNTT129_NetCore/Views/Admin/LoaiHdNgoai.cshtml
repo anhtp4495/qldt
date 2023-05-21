@@ -1,0 +1,288 @@
+﻿@{
+    ViewBag.Title = "VaiTro";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+
+    var trang_thai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected == "" },
+        new SelectListItem() { Value = "0", Text = "Chưa khóa", Selected = ViewBag.selected == "0" },
+        new SelectListItem() { Value = "1", Text = "Đã khóa", Selected = ViewBag.selected == "1" }
+    };
+}
+<div class="border-bottom-0">
+    <ul class="nav nav-tabs" id="">
+        <li class="nav-item">
+            <a id="tab-1" class="nav-link active" href="/Admin/LoaiHdNgoai">Danh mục loại hoạt động ngoài</a>
+        </li>
+    </ul>
+</div>
+@using (Html.BeginForm("LoaiHdNgoai", "Admin", FormMethod.Post, new { @class = "" }))
+{
+    <div class="row mt-3">
+        <div class="col-md-1">
+            Mã vai trò
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="hd_code" id="hd_code" value="@ViewBag.hd_code" />
+        </div>
+        <div class="col-md-1">
+            Tên vai trò
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="hd_name" id="hd_name" value="@ViewBag.hd_name" />
+        </div>
+        <div class="col-md-1">
+            Trạng thái
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="trang_thai" name="trang_thai" asp-items="@trang_thai_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            <input class="btn btn-primary form-control" name="find" value="Tìm" type="submit" />
+        </div>
+    </div>
+}
+<div class="row mt-2">
+    <div class="col-md-4 text-right">
+    </div>
+    <div class="col-md-4 text-right">
+    </div>
+    <div class="col-md-4 text-right">
+        @{
+            if (quyen.getDataQuyenGV(gvID, "them_moi_hd_ngoai") == 1 || gvID.Equals("1"))
+            {
+                <button class="btn btn-primary" id="them" onclick="showFrom(0)">Thêm mới</button>
+            }
+        }
+    </div>
+</div>
+<div id="khung" class=" mt-2">
+    <div id="list">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>STT</td>
+                    <td>Mã</td>
+                    <td>Tên</td>
+                    <td>Trạng thái</td>
+                    <td>Thao tác</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var data = ViewData["data"];
+                    if (ViewData["data"] != null)
+                    {
+                        int i = 1;
+                        foreach (var std in ViewData["data"] as IList<CNTT129.Models.LOAI_HOAT_DONG_NGOAI>)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@std.CODE_HD_NGOAI</td>
+                                <td>@std.TEN_HD_NGOAI</td>
+                                <td>
+                                    @{
+                            if (std.disabled == 0)
+                            {
+                                <span>Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span>Đã khóa</span>
+                            }
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                            if (quyen.getDataQuyenGV(gvID, "sua_hd_ngoai") == 1 || gvID.Equals("1"))
+                            {
+                                <button type="button" class="btn btn-primary" onclick="showFrom(@std.ID_HD_NGOAI)">Sửa</button>
+                            }
+                                    }
+
+                                    @{
+                            if (std.disabled == 0)
+                            {
+                                if (quyen.getDataQuyenGV(gvID, "khoa_mo_hd_ngoai") == 1 || gvID.Equals("1"))
+                                {
+                                    <button type="button" class="btn btn-danger" onclick="showFromDisbled(@std.ID_HD_NGOAI,'@std.TEN_HD_NGOAI.ToString()',1)">Khóa</button>
+                                }
+                            }
+                            else
+                            {
+                                if (quyen.getDataQuyenGV(gvID, "khoa_mo_vai_tro_sv") == 1 || gvID.Equals("1"))
+                                {
+                                    <button type="button" class="btn btn-success" onclick="showFromDisbled(@std.ID_HD_NGOAI,'@std.TEN_HD_NGOAI.ToString()',0)">Mở khóa</button>
+                                }
+                            }
+                                    }
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="editDivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id='editDiv' class="">
+                    <input id="id_vt" class="form-control d-none" />
+                    <div class="row">
+                        <div class="col-2">
+                            Mã VT
+                        </div>
+                        <div class="col-4">
+                            <input id="ma_vt" class="form-control" placeholder="Nhập mã hoạt động" />
+                        </div>
+                        <div class="col-2">
+                            Tên VT
+                        </div>
+                        <div class="col-4">
+                            <input id="ten_vt" class="form-control" placeholder="Nhập tên hoạt động" />
+                        </div>
+                        <div class="col-2 mt-2">
+                            ĐIỂM CỘNG
+                        </div>
+                        <div class="col-4  mt-2">
+                            <input id="diem" class="form-control" placeholder="Nhập điểm cộng" type="number"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id='dialog-err' class='error-msg'></span>
+                <button class="btn" onclick="save()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showFrom(id) {
+        $('#dialog-err').text("");
+        var dataList = [];
+        var data = {
+            ID_HD_NGOAI: id,
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/findHdNgoai',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                var _title = "Sửa hoạt động";
+                $('#ten_vt').val("");
+                $('#ma_vt').val("");
+                document.getElementById("ma_vt").disabled = true;
+                $('#id_vt').val(id);
+                if (id == 0) {
+                    _title = "Thêm mới";
+                    document.getElementById("ma_vt").disabled = false;
+                }
+                if (res.res.length > 0) {
+                    $('#ten_vt').val(res.res[0].TEN_HD_NGOAI);
+                    $('#ma_vt').val(res.res[0].CODE_HD_NGOAI);
+                    $('#diem').val(res.res[0].DIEM);
+                }
+                $('#editDivModal').modal('show');
+                $('#editDivModal #myModalLabel').html(_title);
+            }
+        })
+    }
+    function save() {
+        var dataList = [];
+        if ($('#ten_vt').val().trim() == "" || $('#ma_vt').val().trim() == "" || $('#diem').val() == "") {
+            $('#dialog-err').text("Vui lòng điền đủ thông tin");
+            return;
+        }
+        if ($('#diem').val() <= 0) {
+            $('#dialog-err').text("Vui lòng nhập điểm lớn hơn không");
+            return;
+        }
+        var data = {
+            TEN_HD_NGOAI: $('#ten_vt').val(),
+            CODE_HD_NGOAI: $('#ma_vt').val(),
+            ID_HD_NGOAI: $('#id_vt').val(),
+            DIEM: $('#diem').val()
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/saveHdNgoai',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                } else if (res.res == 2) {
+                    $('#dialog-err').text("Mã hoạt động đã tồn tại");
+                }
+                else {
+                    location.reload();
+                    $('#editDivModal').modal('hide');
+                }
+            }
+        })
+    }
+    function showFromDisbled(id, name, disabled) {
+        var dataList = [];
+        var data = {
+            ID_HD_NGOAI: id,
+            disabled: disabled.toString()
+        };
+        var title = "";
+        if (disabled == 0) {
+            title = "Khóa";
+        } else {
+            title = "Mở khóa";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' hoạt động',
+            message: 'Bạn có muốn ' + title + ' hoạt động "' + name + '"?',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updateHdNgoai',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+</script>

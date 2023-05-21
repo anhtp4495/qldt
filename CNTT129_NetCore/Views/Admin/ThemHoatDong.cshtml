@@ -1,0 +1,367 @@
+﻿@{
+    ViewBag.Title = "ThemHoatDong";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string Ten_gv = HttpContextAccessor.HttpContext.Session.Get<string>("Ten_gv");
+    string ma_gv = HttpContextAccessor.HttpContext.Session.Get<string>("ma_gv");
+    KHOA khoa = new KHOA();
+    var menu_khoa = khoa.find("", "", "0");
+    HOCKY hocky = new HOCKY();
+    var menu_hocky = hocky.find();
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="border-bottom-0">
+            <ul class="nav nav-tabs" id="">
+                <li class="nav-item">
+                    <a id="tab-1" class="nav-link active" href="/Admin/ThemHoatDong">Thêm hoạt động</a>
+                </li>
+                <li class="nav-item">
+                    <a id="tab-2" class="nav-link" href="/Admin/DanhSachHoatDong">Danh sách hoạt động</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <label>Mã hoạt động</label>
+        <input class="form-control" id="ma_hd" name="ma_hd" placeholder="Mã hoạt động tự động tạo" readonly="readonly" />
+    </div>
+    <div class="col-md-3">
+        <label>Tiêu đề hoạt động</label>
+        <input class="form-control" id="name_hd" name="name_hd" placeholder="Tên hoạt động" />
+    </div>
+    <div class="col-md-2">
+        <label>Người tạo</label><br />
+        <label style="font-weight: 100; color: red">@Ten_gv - @ma_gv</label>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <label>Số người</label>
+        <input class="form-control" id="so_nguoi_hd" name="so_nguoi_hd" placeholder="Số người tham gia" type="number" value="0" />
+    </div>
+    <div class="col-md-3">
+        <label>Điểm</label>
+        <input class="form-control" id="diem_hd" name="diem_hd" placeholder="Điểm tham gia" type="number" value="0" />
+    </div>
+    <div class="col-md-2">
+        <label>Ngày bắt đầu đăng ký</label><br />
+        <input class="form-control" id="ngay_bd_dk_hd" name="ngay_bd_dk_hd" placeholder="Ngày bắt đầu đăng ký" />
+    </div>
+    <div class="col-md-2">
+        <label>Ngày kết thúc đăng ký</label><br />
+        <input class="form-control" id="ngay_kt_dk_hd" name="ngay_kt_dk_hd" placeholder="Ngày kết thúc đăng ký" />
+    </div>
+    <div class="col-md-2">
+        <label>Loại hoạt động</label><br />
+        <select class="form-control" id="loai_hd">
+            <option value="1">Buổi</option>
+            <option value="2">Cả ngày</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Đơn</label><br />
+        <select class="form-control" id="khoa" name="khoa">
+            @{
+                foreach (var item in menu_khoa)
+                {
+                <option value="@item.ID_KHOA">@item.TEN_KHOA</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Học kỳ</label><br />
+        <select class="form-control" id="hocky" name="hocky">
+            @{
+                foreach (var item in menu_hocky)
+                {
+                <option value="@item.IDHK">@item.TENHK</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Địa điểm</label><br />
+        <input class="form-control" id="dia_diem_hd" name="dia_diem_hd" placeholder="Địa điểm hoạt động" />
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <button type="button" class="btn btn-info" id="them_ngay_bd">Thêm ngày bắt đầu</button>
+    </div>
+    <div class="col-md-9">
+        <table id="table_ngay_bd">
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-xl-3">
+        <button type="button" class="btn btn-primary" name="them" value="them" id="themImg">Thêm Ảnh</button>
+    </div>
+    <div class="col-xl-9">
+        <table id="table_img">
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-6">
+        <label>Nội dung</label><br />
+        <textarea class="w-100" style="height: 400px" placeholder="nội dung" id="noi_dung"></textarea>
+    </div>
+    <div class="col-md-6">
+        <label>Yêu cầu</label><br />
+        <textarea class="w-100" style="height: 400px" placeholder="Yêu cầu" id="ghi_chu_hd"></textarea>
+        @*<input class="form-control" id="ghi_chu_hd" name="ghi_chu_hd" placeholder="Ghi chú hoạt động" />*@
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+    </div>
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-4 text-right">
+        <span id='dialog-err' class='error-msg'></span>
+    </div>
+    <div class="col-md-1 text-right">
+        <button type="button" class="btn btn-primary" name="save" value="save" id="save">Lưu</button>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ngay_bd_dk_hd').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, startDate: new Date() }).datepicker('update', new Date());
+        $('#ngay_kt_dk_hd').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, startDate: new Date() }).datepicker('update', new Date());
+    })
+    $('#them_ngay_bd').off('click').on('click', function () {
+        var row = $('#table_ngay_bd tr').length;
+        var str = '<tr id="row_' + row + '">\
+            <td>\
+                <input class="form-control" id="ngay_bd_hd_' + row + '" type="text"/>\
+                <input class="form-control" type="hidden" id="delete_' + row + '" value ="0"/>\
+            </td>';
+        if ($('#loai_hd').val() == 1) {
+            str += ' <td>\
+                <input type="checkbox" id="sang_' + row + '"/> Sáng (7h-11h)\
+                <input type="checkbox" id="chieu_' + row + '"/> Chiều (13h-17h)\
+                <input type="checkbox" id="toi_' + row + '"/> Tối (18h-22h)\
+            </td>';
+        }
+        str += ' <td>\
+                <button type="button" class="btn btn-danger" name="xoa" value="xoa" onclick="XoaDate(' + row + ')">Xóa</button>\
+            </td></tr>';
+        $('#table_ngay_bd tbody').append(str);
+        
+        $('#ngay_bd_hd_' + row).datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, startDate: new Date(), }).datepicker('update', new Date());
+    });
+    function XoaDate(rowDelete) {
+        $('#delete_' + rowDelete).val(1);
+        $('#row_' + rowDelete).hide();
+    }
+    $('#themImg').off('click').on('click', function () {
+        var row = $('#table_img tr').length;
+        var str = '<tr id="row_img_' + row + '"><td><img src="#" id="img_' + row + '" style="width:120px;height:120px"/></td><td><div class="input-group mb-3"><div class="custom-file"><input type="file" class="custom-file-input hinh5" id="inputGroupFile_' + row + '" name="" onchange="loadImg(this,' + row + ')" data-id="' + row + '"><label class="custom-file-label" for="inputGroupFile_' + row + '">Choose file</label></div></div></td><td><button type="button" class="btn btn-danger" name="them" value="them" onclick="XoaImg(' + row + ')" style="margin-bottom: 17px">Xóa</button></td></tr>';
+        $('#table_img tbody').append(str);
+        $('#img_' + row).hide();
+    });
+
+    function XoaImg(rowDelete) {
+        var row = $('#table_img tr').length;
+        $('#row_img_' + rowDelete).remove();
+    }
+
+    function loadImg(input, row) {
+        if (input.files && input.files[0]) {
+            var read = new FileReader();
+            read.onload = function (e) {
+                $('#img_' + row).attr("src", e.target.result);
+            }
+            read.readAsDataURL(input.files[0]);
+            $('#img_' + row).show();
+        }
+    }
+
+    $('#loai_hd').on('change', function () {
+        var row = $('#table_ngay_bd tr').length;
+        var is_not_delete = 0;
+        for (var i = 0; i < row; i++) {
+            if ($('#delete_' + i).val() == 0) {
+                is_not_delete++;
+            }
+        }
+        for (var i = 0; i < row; i++) {
+            $('#row_' + i).remove();
+        }
+        for (var i = 0; i < is_not_delete; i++) {
+            var str = '<tr id="row_' + i + '">\
+            <td>\
+                <input class="form-control" id="ngay_bd_hd_' + i + '" type="text"/>\
+                <input class="form-control" type="hidden" id="delete_' + i + '" value ="0"/>\
+            </td>';
+            if ($('#loai_hd').val() == 1) {
+                str += ' <td>\
+                <input type="checkbox" id="sang_' + i + '"/> Sáng (7h-11h)\
+                <input type="checkbox" id="chieu_' + i + '"/> Chiều (13h-17h)\
+                <input type="checkbox" id="toi_' + i + '"/> Tối (18h-22h)\
+            </td>';
+            }
+            str += ' <td>\
+                <button type="button" class="btn btn-danger" name="xoa" value="xoa" onclick="XoaDate(' + i + ')">Xóa</button>\
+            </td></tr>';
+            $('#table_ngay_bd tbody').append(str);
+            $('#ngay_bd_hd_' + i).datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, startDate: new Date(), }).datepicker('update', new Date());
+        }
+    });
+
+    $('#save').off('click').on('click', function () {
+        var dateTao = new Date();
+        var date = new Date();
+        var dateNow = new Date(date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate());
+        $('#dialog-err').text("");
+        if ($('#name_hd').val() == ""  || $('#so_nguoi_hd').val() == "" || $('#so_nguoi_hd').val() <= 0 || $('#diem_hd').val() == "" || $('#diem_hd').val() <= 0 || $('#noi_dung').val() == "" || $('#dia_diem_hd').val() == "") {
+            $('#dialog-err').text("Vui lòng điền đủ thông tin");
+            return;
+        }
+        var ngay_bd_dk_hd = $('#ngay_bd_dk_hd').val().split("/");
+        var ngay_kt_dk_hd = $('#ngay_kt_dk_hd').val().split("/");
+        var datebd = new Date(ngay_bd_dk_hd[2] + '/' + ngay_bd_dk_hd[1] + '/' + ngay_bd_dk_hd[0]);
+        var datekt = new Date(ngay_kt_dk_hd[2] + '/' + ngay_kt_dk_hd[1] + '/' + ngay_kt_dk_hd[0]);
+        if (datebd < dateNow || datekt < dateNow) {
+            $('#dialog-err').text("Ngày bắt đầu đăng ký hoặc ngày kết thúc nhỏ hơn ngày hiện tại");
+            return;
+        }
+        if (datebd > datekt) {
+            $('#dialog-err').text("Ngày bắt đầu nhỏ hơn ngày kết thúc");
+            return;
+        }
+        var row = $('#table_ngay_bd tr').length;
+        if (row == 0) {
+            $('#dialog-err').text("Vui lòng thêm ngày bắt đầu");
+            return;
+        }
+        for (var i = 0; i < row; i++) {
+            var ngay_bd_hd = $('#ngay_bd_hd_' + i).val().split("/");
+            var date_bd = new Date(ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0]);
+            if (date_bd < datekt) {
+                $('#dialog-err').text("Hiện có ngày bắt đầu nhỏ hơn ngày kết thúc");
+                return;
+            }
+        }
+        for (var i = 0; i < row - 1; i++) {
+            for (var j = i + 1; j < row; j++) {
+                if ($('#ngay_bd_hd_' + i).val() == $('#ngay_bd_hd_' + j).val() && $('#delete_' + i).val() == 0 && $('#delete_' + j).val() == 0) {
+                    $('#dialog-err').text("Hiện có ngày trùng nhau. Vui lòng nhập lại.");
+                    return;
+                }
+            }
+        }
+        var data_date = [];
+        for (var i = 0; i < row; i++) {
+            var ngay_bd_hd_ = $('#ngay_bd_hd_' + i).val().split("/");
+            if ($('#loai_hd').val() == 1) {
+                if ($('#delete_' + i).val() == 0 && $('#sang_' + i).is(":checked") == true) {
+                    data_date.push({
+                        ngay_bat_dau: ngay_bd_hd_[2] + '/' + ngay_bd_hd_[1] + '/' + ngay_bd_hd_[0],
+                        loai_buoi: 1
+                    });
+                }
+                if ($('#delete_' + i).val() == 0 && $('#chieu_' + i).is(":checked") == true) {
+                    data_date.push({
+                        ngay_bat_dau: ngay_bd_hd_[2] + '/' + ngay_bd_hd_[1] + '/' + ngay_bd_hd_[0],
+                        loai_buoi: 2
+                    });
+                }
+                if ($('#delete_' + i).val() == 0 && $('#toi_' + i).is(":checked") == true) {
+                    data_date.push({
+                        ngay_bat_dau: ngay_bd_hd_[2] + '/' + ngay_bd_hd_[1] + '/' + ngay_bd_hd_[0],
+                        loai_buoi: 3
+                    });
+                }
+            } else {
+                data_date.push({
+                    ngay_bat_dau: ngay_bd_hd_[2] + '/' + ngay_bd_hd_[1] + '/' + ngay_bd_hd_[0],
+                    loai_buoi: 0
+                });
+            }
+
+        }
+        if (data_date.length == 0) {
+            if ($('#loai_hd').val() == 1) {
+                $('#dialog-err').text("Vui lòng thêm ngày bắt đầu và chọn buổi");
+            } else {
+                $('#dialog-err').text("Vui lòng thêm ngày bắt đầu");
+            }
+            return;
+        }
+        var formData = new FormData();
+        if (formData != undefined) {
+            var row_img = $('#table_img tr').length;
+            var dataImg = [];
+            var list = $('.hinh5');
+            $.each(list, function (i, item) {
+                var fileUpload = $("#inputGroupFile_" + $(item).data('id'))[0].files[0];
+                var fileUpload = $("#inputGroupFile_" + $(item).data('id'))[0].files[0];
+                if (fileUpload == undefined) {
+                    $('#dialog-err').text('Vui lòng chọn ảnh');
+                    return;
+                }
+                dataImg.push(fileUpload.name);
+                formData.append('file', fileUpload);
+            });
+        }
+        var dataList = [];
+        var data = {
+            ten_hd: $('#name_hd').val(),
+            ghi_chu_hd: $('#ghi_chu_hd').val(),
+            dia_diem_hd: $('#dia_diem_hd').val(),
+            so_nguoi_hd: $('#so_nguoi_hd').val(),
+            diem_hd: $('#diem_hd').val(),
+            noi_dung: $('#noi_dung').val(),
+            khoa: $('#khoa').val(),
+            loai_hd: $('#loai_hd').val(),
+            hocky: $('#hocky').val(),
+            hinh_anh: dataImg.join(","),
+            ngay_tao: dateTao.getFullYear() + '/' + (dateTao.getMonth() + 1) + '/' + dateTao.getDate(),
+            ngay_bd_dk_hd: ngay_bd_dk_hd[2] + '/' + ngay_bd_dk_hd[1] + '/' + ngay_bd_dk_hd[0],
+            ngay_kt_dk_hd: ngay_kt_dk_hd[2] + '/' + ngay_kt_dk_hd[1] + '/' + ngay_kt_dk_hd[0],
+            detail: data_date,
+        }
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/saveHD',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                }
+                else {
+                    $.ajax({
+                        url: "/Admin/UploadFiles",
+                        method: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                        },
+                        error: function (data) {
+                        }
+                    })
+                    location.reload();
+                }
+            }
+        })
+    });
+</script>
+

@@ -1,0 +1,678 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet prefetch" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://use.fontawesome.com/releases/v5.0.4/css/all.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            position: relative;
+            overflow-x: hidden;
+            background-color: #667580;
+            background: #e7ecf0;
+            font-size: 12px;
+            font-family: Tahoma !important;
+        }
+
+        body,
+        html {
+            height: 100%;
+        }
+
+        .nav .open > a,
+        .nav .open > a:hover,
+        .nav .open > a:focus {
+            background-color: transparent;
+        }
+
+        /*-------------------------------*/
+        /*           Wrappers            */
+        /*-------------------------------*/
+
+        #wrapper {
+            padding-left: 0;
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+        }
+
+            #wrapper.toggled {
+                padding-left: 220px;
+            }
+
+        #sidebar-wrapper {
+            z-index: 1000;
+            left: 220px;
+            width: 0;
+            height: 100%;
+            margin-left: -220px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #1a1a1a;
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+        }
+
+            #sidebar-wrapper::-webkit-scrollbar {
+                display: none;
+            }
+
+        #wrapper.toggled #sidebar-wrapper {
+            width: 220px;
+        }
+
+        #page-content-wrapper {
+            width: 100%;
+            padding-top: 70px;
+        }
+
+        #wrapper.toggled #page-content-wrapper {
+            position: absolute;
+            margin-right: -220px;
+        }
+
+        /*-------------------------------*/
+        /*     Sidebar nav styles        */
+        /*-------------------------------*/
+        .navbar {
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            position: absolute;
+            top: 0;
+            width: 220px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+            .sidebar-nav li {
+                position: relative;
+                line-height: 20px;
+                display: inline-block;
+                width: 100%;
+            }
+
+                .sidebar-nav li:before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    z-index: -1;
+                    height: 100%;
+                    width: 3px;
+                    background-color: #1c1c1c;
+                    -webkit-transition: width .2s ease-in;
+                    -moz-transition: width .2s ease-in;
+                    -ms-transition: width .2s ease-in;
+                    transition: width .2s ease-in;
+                }
+
+                .sidebar-nav li:first-child a {
+                    color: #fff;
+                    background-color: #1a1a1a;
+                }
+
+                .sidebar-nav li:nth-child(5n+1):before {
+                    background-color: #ec1b5a;
+                }
+
+                .sidebar-nav li:nth-child(5n+2):before {
+                    background-color: #79aefe;
+                }
+
+                .sidebar-nav li:nth-child(5n+3):before {
+                    background-color: #314190;
+                }
+
+                .sidebar-nav li:nth-child(5n+4):before {
+                    background-color: #279636;
+                }
+
+                .sidebar-nav li:nth-child(5n+5):before {
+                    background-color: #7d5d81;
+                }
+
+                .sidebar-nav li:hover:before,
+                .sidebar-nav li.open:hover:before {
+                    width: 100%;
+                    -webkit-transition: width .2s ease-in;
+                    -moz-transition: width .2s ease-in;
+                    -ms-transition: width .2s ease-in;
+                    transition: width .2s ease-in;
+                }
+
+                .sidebar-nav li a {
+                    display: block;
+                    color: #ddd;
+                    text-decoration: none;
+                    padding: 10px 15px 10px 30px;
+                }
+
+                    .sidebar-nav li a:hover,
+                    .sidebar-nav li a:active,
+                    .sidebar-nav li a:focus,
+                    .sidebar-nav li.open a:hover,
+                    .sidebar-nav li.open a:active,
+                    .sidebar-nav li.open a:focus {
+                        color: #fff;
+                        text-decoration: none;
+                        background-color: transparent;
+                    }
+
+        .sidebar-header {
+            text-align: center;
+            font-size: 20px;
+            position: relative;
+            width: 100%;
+            display: inline-block;
+        }
+
+        .sidebar-brand {
+            height: 65px;
+            position: relative;
+            background: #212531;
+            background: linear-gradient(to right bottom, #2f3441 50%, #212531 50%);
+            padding-top: 1em;
+        }
+
+            .sidebar-brand a {
+                color: #ddd;
+            }
+
+                .sidebar-brand a:hover {
+                    color: #fff;
+                    text-decoration: none;
+                }
+
+        .dropdown-header {
+            text-align: center;
+            font-size: 1em;
+            color: #ddd;
+            background: #212531;
+            background: linear-gradient(to right bottom, #2f3441 50%, #212531 50%);
+        }
+
+        .sidebar-nav .dropdown-menu {
+            position: relative;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            border-radius: 0;
+            border: none;
+            background-color: #222;
+            box-shadow: none;
+        }
+
+        .dropdown-menu.show {
+            top: 0;
+        }
+        /*Fontawesome icons*/
+        .nav.sidebar-nav li a::before {
+            font-family: fontawesome;
+            content: "\f12e";
+            vertical-align: baseline;
+            display: inline-block;
+            padding-right: 5px;
+        }
+
+        a[href*="#home"]::before {
+            content: "\f015" !important;
+        }
+
+        a[href*="#about"]::before {
+            content: "\f129" !important;
+        }
+
+        a[href*="#events"]::before {
+            content: "\f073" !important;
+        }
+
+        a[href*="#events"]::before {
+            content: "\f073" !important;
+        }
+
+        a[href*="#team"]::before {
+            content: "\f0c0" !important;
+        }
+
+        a[href*="#works"]::before {
+            content: "\f0b1" !important;
+        }
+
+        a[href*="#pictures"]::before {
+            content: "\f03e" !important;
+        }
+
+        a[href*="#videos"]::before {
+            content: "\f03d" !important;
+        }
+
+        a[href*="#books"]::before {
+            content: "\f02d" !important;
+        }
+
+        a[href*="#art"]::before {
+            content: "\f1fc" !important;
+        }
+
+        a[href*="#awards"]::before {
+            content: "\f02e" !important;
+        }
+
+        a[href*="#services"]::before {
+            content: "\f013" !important;
+        }
+
+        a[href*="#contact"]::before {
+            content: "\f086" !important;
+        }
+
+        a[href*="#followme"]::before {
+            content: "\f099" !important;
+            color: #0084b4;
+        }
+        /*-------------------------------*/
+        /*       Hamburger-Cross         */
+        /*-------------------------------*/
+
+        .hamburger {
+            position: fixed;
+            z-index: 999;
+            display: block;
+            width: 32px;
+            height: 32px;
+            margin-left: 15px;
+            background: transparent;
+            border: none;
+        }
+
+            .hamburger:hover,
+            .hamburger:focus,
+            .hamburger:active {
+                outline: none;
+            }
+
+            .hamburger.is-closed:before {
+                content: '';
+                display: block;
+                width: 100px;
+                font-size: 14px;
+                color: #fff;
+                line-height: 32px;
+                text-align: center;
+                opacity: 0;
+                -webkit-transform: translate3d(0,0,0);
+                -webkit-transition: all .35s ease-in-out;
+            }
+
+            .hamburger.is-closed:hover:before {
+                opacity: 1;
+                display: block;
+                -webkit-transform: translate3d(-100px,0,0);
+                -webkit-transition: all .35s ease-in-out;
+            }
+
+            .hamburger.is-closed .hamb-top,
+            .hamburger.is-closed .hamb-middle,
+            .hamburger.is-closed .hamb-bottom,
+            .hamburger.is-open .hamb-top,
+            .hamburger.is-open .hamb-middle,
+            .hamburger.is-open .hamb-bottom {
+                position: absolute;
+                left: 0;
+                height: 4px;
+                width: 100%;
+            }
+
+            .hamburger.is-closed .hamb-top,
+            .hamburger.is-closed .hamb-middle,
+            .hamburger.is-closed .hamb-bottom {
+                background-color: #1a1a1a;
+            }
+
+            .hamburger.is-closed .hamb-top {
+                top: 5px;
+                -webkit-transition: all .35s ease-in-out;
+            }
+
+            .hamburger.is-closed .hamb-middle {
+                top: 50%;
+                margin-top: -2px;
+            }
+
+            .hamburger.is-closed .hamb-bottom {
+                bottom: 5px;
+                -webkit-transition: all .35s ease-in-out;
+            }
+
+            .hamburger.is-closed:hover .hamb-top {
+                top: 0;
+                -webkit-transition: all .35s ease-in-out;
+            }
+
+            .hamburger.is-closed:hover .hamb-bottom {
+                bottom: 0;
+                -webkit-transition: all .35s ease-in-out;
+            }
+
+            .hamburger.is-open .hamb-top,
+            .hamburger.is-open .hamb-middle,
+            .hamburger.is-open .hamb-bottom {
+                background-color: #1a1a1a;
+            }
+
+            .hamburger.is-open .hamb-top,
+            .hamburger.is-open .hamb-bottom {
+                top: 50%;
+                margin-top: -2px;
+            }
+
+            .hamburger.is-open .hamb-top {
+                -webkit-transform: rotate(45deg);
+                -webkit-transition: -webkit-transform .2s cubic-bezier(.73,1,.28,.08);
+            }
+
+            .hamburger.is-open .hamb-middle {
+                display: none;
+            }
+
+            .hamburger.is-open .hamb-bottom {
+                -webkit-transform: rotate(-45deg);
+                -webkit-transition: -webkit-transform .2s cubic-bezier(.73,1,.28,.08);
+            }
+
+            .hamburger.is-open:before {
+                content: '';
+                display: block;
+                width: 100px;
+                font-size: 14px;
+                color: #fff;
+                line-height: 32px;
+                text-align: center;
+                opacity: 0;
+                -webkit-transform: translate3d(0,0,0);
+                -webkit-transition: all .35s ease-in-out;
+            }
+
+            .hamburger.is-open:hover:before {
+                opacity: 1;
+                display: block;
+                -webkit-transform: translate3d(-100px,0,0);
+                -webkit-transition: all .35s ease-in-out;
+            }
+
+        /*-------------------------------*/
+        /*            Overlay            */
+        /*-------------------------------*/
+
+        .overlay {
+            position: fixed;
+            display: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(250,250,250,.8);
+            z-index: 1;
+        }
+    </style>
+</head>
+
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string id_sv = HttpContextAccessor.HttpContext.Session.Get<string>("id_sv");
+    string Ten_sv = HttpContextAccessor.HttpContext.Session.Get<string>("Ten_sv");
+    HOATDONG hoatdong = new HOATDONG();
+    hoatdong.khoaFormDangKyAll();
+    hoatdong.khoaFormDiemDanhAll();
+
+    DANGKY dangky = new DANGKY();
+    dangky.capnhatKhongThamGia();
+
+    HoatDongBuoi hdb = new HoatDongBuoi();
+    hdb.updateTTHdb();
+}
+<body>
+    <div class="card-header" style="background-color:white;border-bottom: 1px solid #e7ecf0;height:57px">
+        <div class="container-sm">
+            <nav class="navbar navbar-expand-md " style="margin-top: -19px">
+                <div class="container">
+                    <a class="navbar-brand text-white" href="/SinhVien/Home" style="margin-top:10px"><img src="~/IMG/sv_logo_dashboard.png" style="max-height: 40px" /></a>
+                    <div class="d-block d-sm-block d-md-none d-lg-none d-xl-none" style="margin-bottom:23px;margin-right:20px">
+                        <button type="button" class="hamburger animated fadeInLeft is-closed" data-toggle="offcanvas">
+                            <span class="hamb-top"></span>
+                            <span class="hamb-middle"></span>
+                            <span class="hamb-bottom"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                        <ul class="navbar-nav ml-auto">
+
+                            <li class="nav-item ">
+                                <a class="nav-link " href="/SinhVien/Home" style="color:black"><i class="fa fa-home" aria-hidden="true"></i> Trang chủ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="/SinhVien/TinTuc" style="color:black">
+                                    <i class="fa fa-briefcase"></i>
+                                    <span style="left: 7px;top: -7px;min-width:16px ;width:auto; max-width:20px ;animation: bellmove 0.5s 5;" class="badge badge-danger">
+                                        @hoatdong.findCountHD()
+                                    </span>Tin tức
+                                </a>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:black">
+                                    <i class="fa fa-user"></i> @Ten_sv
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    @*<a class="dropdown-item" href="#">  Thông tin chung</a>*@
+                                    <button class="dropdown-item" id="them" onclick="showFromDoiMk()">Đổi mật khẩu</button>
+                                    <a class="dropdown-item" href="/SinhVien/DangXuat">  Đăng xuất</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div id="wrapper">
+        <div class="overlay"></div>
+        <nav class="navbar navbar-inverse fixed-top" id="sidebar-wrapper" role="navigation">
+            <ul class="nav sidebar-nav">
+                <div class="sidebar-header">
+                    <div class="sidebar-brand">
+                        <a href="#">Hufi</a>
+                    </div>
+                </div>
+                <li><a href="/SinhVien/Home">Home</a></li>
+                <li><a href="/SinhVien/TinTuc">Tin tức</a></li>
+                <li><a href="/SinhVien/HOATDONGNGOAI">Danh sách hoạt động ngoài giờ</a></li>
+                <li><a href="/SinhVien/TinhThamGiaHDCuaSV">Tình hình tham gia hoạt động</a></li>
+                <li><a href="/SinhVien/List_Phan_Hoi">Danh sách phản hồi</a></li>
+                <li><a href="/SinhVien/ketqua">Kết quả</a></li>
+                <li><a href="/SinhVien/DangXuat">Đăng xuất</a></li>
+            </ul>
+        </nav>
+
+        <div class="d-none d-sm-none d-md-block d-lg-block d-xl-block">
+            <button type="button" class="hamburger animated fadeInLeft is-closed" data-toggle="offcanvas">
+                <span class="hamb-top"></span>
+                <span class="hamb-middle"></span>
+                <span class="hamb-bottom"></span>
+            </button>
+        </div>
+    </div>
+    <div class="container-sm">
+
+        <div>
+            @RenderBody()
+        </div>
+    </div>
+    <div class="modal fade bs-example-modal-lg" id="editDivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Đổi mật khẩu</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div id='editDiv' class="">
+                        <div class="container text-center">
+                            <div class="row mt-2">
+                                <div class="col-2">
+                                    Mật khẩu cũ
+                                </div>
+                                <div class="col-4">
+                                    <input id="mk_cu" class="form-control" placeholder="Nhập mật khẩu cũ" type="password"/>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-2">
+                                    Mật khẩu mới
+                                </div>
+                                <div class="col-4">
+                                    <input id="mk_moi" class="form-control" placeholder="Nhập mật khẩu mới" type="password" />
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-2">
+                                    Nhập lại mật khẩu
+                                </div>
+                                <div class="col-4">
+                                    <input id="mk_nhap" class="form-control" placeholder="Nhập lại mật khẩu" type="password" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <span id='dialog-err' class='error-msg'></span>
+                    <button class="btn" onclick="saveMK()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+    <script src="~/Scripts/js_file.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var trigger = $('.hamburger'),
+                overlay = $('.overlay'),
+               isClosed = false;
+
+            trigger.click(function () {
+                hamburger_cross();
+            });
+
+            function hamburger_cross() {
+
+                if (isClosed == true) {
+                    overlay.hide();
+                    trigger.removeClass('is-open');
+                    trigger.addClass('is-closed');
+                    isClosed = false;
+                } else {
+                    overlay.show();
+                    trigger.removeClass('is-closed');
+                    trigger.addClass('is-open');
+                    isClosed = true;
+                }
+            }
+
+            $('[data-toggle="offcanvas"]').click(function () {
+                $('#wrapper').toggleClass('toggled');
+            });
+        });
+        function showFromDoiMk() {
+            $('#editDivModal').modal('show');
+            $('#editDivModal #myModalLabel').html(_title);
+        }
+        function saveMK() {
+            $('#dialog-err').text("");
+            var dataList = [];
+            var data = {
+                ID: @id_sv + "",
+                mk_cu: $('#mk_cu').val() + "",
+            };
+            dataList.push(data);
+            $.ajax({
+                url: '/SinhVien/KtraMk',
+                data: { cartModel: JSON.stringify(dataList) },
+                dataType: 'json',
+                type: 'POST',
+                success: function (res) {
+                    if (res.res == 0) {
+                        $('#dialog-err').text("Mật khẩu cũ không đúng");
+                    }
+                    else {
+                        if ($('#mk_moi').val()  == $('#mk_cu').val()) {
+                            $('#dialog-err').text("Mật khẩu mới không được trùng với mật khẩu cũ");
+                            return;
+                        }
+                        if ($('#mk_moi').val().length < 5) {
+                            $('#dialog-err').text("Độ dài mật khẩu phải lớn hơn hoặc bằng 5 ký tự");
+                            return;
+                        }
+                        if ($('#mk_moi').val() == $('#mk_nhap').val()) {
+                            var dataList2 = [];
+                            var data2 = {
+                                ID: @id_sv + "",
+                                mk_moi: $('#mk_moi').val() + "",
+                            };
+                            dataList2.push(data2);
+                            $.ajax({
+                                url: '/SinhVien/updateMk',
+                                data: { cartModel: JSON.stringify(dataList2) },
+                                dataType: 'json',
+                                type: 'POST',
+                                success: function (res) {
+                                    if (res.res == 0) {
+                                        $('#dialog-err').text("Mật khẩu cũ không đúng");
+                                    }
+                                    else {
+                                        location.reload();
+                                        $('#editDivModal').modal('hide');
+                                    }
+                                }
+                            })
+                        } else {
+                            $('#dialog-err').text("Mật khẩu mới không giống nhau");
+                        }
+                    }
+                }
+            })
+        }
+    </script>
+</body>
+</html>

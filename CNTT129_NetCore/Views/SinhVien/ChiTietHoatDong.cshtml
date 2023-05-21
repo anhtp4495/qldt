@@ -1,0 +1,383 @@
+﻿@{
+    ViewBag.Title = "ChiTietHoatDong";
+    Layout = "~/Views/Shared/_Layout_SinhVien.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string id_sv = HttpContextAccessor.HttpContext.Session.Get<string>("id_sv");
+    HOATDONG hoatdong = new HOATDONG();
+    HoatDongBuoi hdb = new HoatDongBuoi();
+    List<HoatDongBuoi> listDate = new List<HoatDongBuoi>();
+    listDate = hdb.findByID(ViewBag.id_hd);
+    SINHVIEN sv = new SINHVIEN();
+    List<SINHVIEN> listSv = new List<SINHVIEN>();
+    listSv = sv.findByID2(int.Parse(id_sv));
+
+    List<HOATDONG> listHD = new List<HOATDONG>();
+    listHD = hoatdong.findBy(5);
+
+    DANGKY dk = new DANGKY();
+}
+<style>
+    .filter-report-info {
+        border: 1px solid #81b2dc;
+        border-radius: 5px;
+        margin-bottom: 0;
+        background: #f4f8fb;
+    }
+
+    .legend-info {
+        font-weight: bold;
+        color: #0351b5;
+        margin-bottom: 0;
+    }
+</style>
+<div class="row mt-2">
+    <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+        <div class="card">
+            <div class="card-body">
+                <h6 style="text-transform:uppercase">@ViewBag.ma_hd - @ViewBag.tieu_de</h6>
+                <fieldset class="filter-report-info">
+                    <legend class="legend-info">Thông tin hoạt động:</legend>
+                    <div class="mb-2 mt-2" style="margin-left:10px">
+                        <span>Nội dung công việc: </span><span style="font-weight:800">@ViewBag.noi_dung</span><br />
+                        <span>Số lượng sinh viên:</span><span style="font-weight:800"> @ViewBag.so_nguoi sinh viên</span><br />
+                        <span>
+                            Điểm: <span style="font-weight:800">
+                                @ViewBag.diem điểm/
+                                @{
+                                    if (ViewBag.loai_hd == 1)
+                                    {
+                                        <span>Buổi</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Cả ngày</span>
+                                    }
+                                }
+                            </span>
+                        </span><br />
+                        <span>Địa điểm: </span><span style="font-weight:800">@ViewBag.dia_diem</span><br />
+                        <span>Yêu cầu: </span><span style="font-weight:800">@ViewBag.ghi_chu</span><br />
+                        <span>Thời gian:</span><br />
+                        <div style="margin-left:10px;font-weight:800">
+                            @{
+                                foreach (var item in listDate)
+                                {
+                                    DateTime ngay_dd = DateTime.Parse(item.NGAYDIEMDANH);
+                                    var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                                    if (item.LOAI_BUOI == "1")
+                                    {
+                                        <span>Sáng (7h-11h) - @datedd</span><br />
+                                    }
+                                    if (item.LOAI_BUOI == "2")
+                                    {
+                                        <span>Chiều (13h-17h) - @datedd </span><br />
+                                    }
+                                    if (item.LOAI_BUOI == "3")
+                                    {
+                                        <span>Tối (18h-22h) - @datedd</span><br />
+                                    }
+                                    if (item.LOAI_BUOI == "0")
+                                    {
+                                        <span>Cả ngày- @datedd</span><br />
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="filter-report-info">
+                    <legend class="legend-info">Thông tin đăng ký:</legend>
+                    <div style="margin-left:10px;margin-bottom:10px">
+                        @{
+                            foreach (var item in listSv)
+                            {
+                                <div class="w-100 mt-1">
+                                    <label>Mã sinh viên</label><br />
+                                    <span style="font-weight:800" id="masv">@item.MASV</span><br />
+                                </div>
+                                <div class="w-100 mt-1">
+                                    <label>Họ và tên</label><br />
+                                    <span style="font-weight:800" id="tensv">@item.TENSV</span><br />
+                                </div>
+                                <div class="w-100 mt-1">
+                                    <label>Email</label><br />
+                                    <span style="font-weight:800" id="emailsv">@item.email</span><br />
+                                </div>
+                                <div class="w-100 mt-1">
+                                    <label>Điện thoại</label><br />
+                                    <span style="font-weight:800" id="sdtsv">@item.SDT</span><br />
+                                </div>
+                            }
+                        }
+                        @ViewBag.ngay_kt
+                        <hr />
+                        @{
+                            DateTime ngay_ht = DateTime.Today;
+                            var dateht = ngay_ht.ToString("dd/MM/yyyy");
+                            if (ViewBag.ngay_kt2 < ngay_ht)
+                            {
+                                <div class="w-100 text-center">
+                                    <h4>Hiện tại from đăng ký đã đóng</h4>
+                                    <h6>Vui lòng liên hệ Admin để biết thêm chi tiết!!!</h6>
+                                </div>
+                            }
+                            else if (ViewBag.ngay_bd2 > ngay_ht)
+                            {
+                                <div class="w-100 text-center">
+                                    <h4>Hiện tại from đăng ký chưa mở</h4>
+                                    <h6>Vui lòng liên hệ Admin để biết thêm chi tiết!!!</h6>
+                                </div>
+                            }
+                            else
+                            {
+                                if (ViewBag.tinh_trang == 0)
+                                {
+                                    <div class="row">
+                                        <div class="col-sm-6 col-lg-6 col-md-6 col-xl-6" style="border-right: 1px inset black">
+                                            <h6>Thông tin liên lạc khác</h6>
+                                            <div class="w-100 mt-1">
+                                                <label>Email</label><br />
+                                                <input class="form-control form-control-sm w-50" id="email" name="email" placeholder="Email" />
+                                            </div>
+                                            <div class="w-100 mt-1">
+                                                <label>SDT</label><br />
+                                                <input class="form-control form-control-sm w-50" id="sdt" name="sdt" placeholder="Số điện thoại" />
+                                            </div>
+                                            <div class="w-100 mt-1">
+                                                <label>Lời nhắn</label><br />
+                                                <textarea class="form-control form-control-sm w-75" style="height:80px" id="loi_nhan"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-lg-6 col-md-6 col-xl-6">
+                                            <h6>Chọn ngày tham gia</h6>
+                                            <div class="w-100 mt-1">
+                                                <div style="margin-left:10px;font-weight:800">
+                                                    @{
+                                    var i = 0;
+                                    foreach (var item in listDate)
+                                    {
+                                        DateTime ngay_dd = DateTime.Parse(item.NGAYDIEMDANH);
+                                        var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                                        var datesql = ngay_dd.ToString("yyyy/MM/dd");
+                                        var textDisable = "";
+                                        var checkeds = "";
+                                        var class_check = "check_date";
+                                        if (item.Trang_Thai != "0" || dk.ktraDangKy(id_sv, item.IDBUOI) != 0 ||dk.ktraDangKyTrung(datesql, item.LOAI_BUOI, id_sv) != 0)
+                                        {
+                                            textDisable = "disabled";
+                                            if (dk.ktraDangKy(id_sv, item.IDBUOI) != 0)
+                                            {
+                                                checkeds = "checked";
+                                                class_check = "";
+                                            }
+                                        }
+                                        if (item.LOAI_BUOI == "1")
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input @class_check" type="checkbox" value="@item.IDBUOI" id="ngay_@i" @textDisable @checkeds data-id="@i">
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                    <span>Sáng (7h-11h) - @datedd</span><br />
+                                                </label>
+                                            </div>
+                                        }
+                                        if (item.LOAI_BUOI == "2")
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input @class_check" type="checkbox" value="@item.IDBUOI" id="ngay_@i" @textDisable @checkeds data-id="@i">
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                    <span>Chiều (13h-17h) - @datedd </span><br />
+                                                </label>
+                                            </div>
+                                        }
+                                        if (item.LOAI_BUOI == "3")
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input @class_check" type="checkbox" value="@item.IDBUOI" id="ngay_@i" @textDisable @checkeds data-id="@i">
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                    <span>Tối (18h-22h) - @datedd</span><br />
+                                                </label>
+                                            </div>
+                                        }
+                                        if (item.LOAI_BUOI == "0")
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input @class_check" type="checkbox" value="@item.IDBUOI" id="ngay_@i" @checkeds @textDisable data-id="@i">
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                    <span>Cả ngày- @datedd</span><br />
+                                                </label>
+                                            </div>
+                                        }
+                                        i++;
+                                    }
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="w-100 text-center mt-2">
+                                            <div>
+                                                @{
+                                    var idsv = id_sv;
+                                                }
+                                                <span id='dialog-err' class='error-msg'></span>
+                                                <button type="button" class="btn btn-success" onclick="save(@idsv,@ViewBag.id_hd)">GỬI THÔNG TIN</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else if (ViewBag.tinh_trang == 1)
+                                {
+                                    <div class="w-100 text-center">
+                                        <h4>Hiện tại from đăng ký đã đóng</h4>
+                                        <h6>Vui lòng liên hệ Admin để biết thêm chi tiết!!!</h6>
+                                    </div>
+                                }
+                            }
+
+                        }
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <h6>Hoạt Động Mới</h6>
+                <hr />
+                @{
+                    foreach (var item in listHD)
+                    {
+                        DateTime date2 = DateTime.Parse(item.NGAYDUYET);
+                        var ngayduyet = date2.ToString("dd/MM/yyyy");
+                        string[] list_img = item.HINHANH.Split(new char[] { ',' });
+                        var hinh = list_img[0] == "" ? "news.png" : list_img[0];
+                        <div class="row mt-2">
+                            <div class="col-3">
+                                <img style="width:80px;height:80px" src="~/IMG/@hinh" />
+                            </div>
+                            <div class="col-9">
+                                <div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                    <a href="/SinhVien/ChiTietHoatDong/?idhd=@item.IDHD.ToString()" style="color: black;font-size:14px">@item.TIEUDE</a>
+                                </div>
+                                <div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;height:45px">
+                                    @item.NOIDUNG
+                                </div>
+                                <div class="w-100 text-right" style="color:red;font-weight:600;opacity:0.7;font-size:11px">@ngayduyet</div>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="w-100 text-right mt-2">
+                    <a href="/SinhVien/TinTuc" class="color-active" lang="db-chitiet-button">Xem thêm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function save(idsv, idhd) {
+        $('#dialog-err').text('');
+        var email = $("#email").val();
+        if ($("#email").val() == "" || $("#sdt").val() == "") {
+            email = $("#emailsv").text();
+        }
+        var sdt = $("#sdt").val();
+        if ($("#sdt").val() == "" || $("#sdt").val() == "") {
+            sdt = $("#sdtsv").text();
+        }
+        if ($("#email").val() != "") {
+            if (checkEmail(email) == false) {
+                $('#dialog-err').text("Email sai định dạng");
+                return;
+            }
+        }
+        if ($("#sdt").val() != "") {
+            if (is_phonenumber($("#sdt").val()) == false) {
+                $('#dialog-err').text("Sai số điện thoại");
+                return;
+            }
+        }
+
+        var list = $('.check_date');
+        var list_buoi = [];
+        $.each(list, function (i, item) {
+            if (document.querySelector("#ngay_" + $(item).data('id')).checked == true) {
+                list_buoi.push($("#ngay_" + $(item).data('id')).val());
+            }
+        });
+        if (list_buoi.length == 0) {
+            $('#dialog-err').text('Vui lòng chọn một buổi tham gia');
+            return;
+        }
+
+        var dataList = [];
+        for (var i = 0; i < list_buoi.length; i++) {
+            var data = {
+                id_buoi: list_buoi[i],
+                idhd: idhd.toString()
+            }
+            dataList.push(data);
+        }
+
+        $.ajax({
+            url: '/SinhVien/KtraTrangThaiHD',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                console.log(res);
+                if (res.data.length == 0) {
+                    var dataList2 = [];
+                    var dateTao = new Date();
+                    for (var i = 0; i < list_buoi.length; i++) {
+                        var data = {
+                            id_buoi: list_buoi[i].toString(),
+                            idsv: idsv.toString(),
+                            MASV: $("#masv").text(),
+                            email: email,
+                            loi_nhan: $("#loi_nhan").val(),
+                            SDT: sdt,
+                            NGAYDANGKY: dateTao.getFullYear() + '/' + (dateTao.getMonth() + 1) + '/' + dateTao.getDate(),
+                        }
+                        dataList2.push(data);
+                    }
+
+                    $.ajax({
+                        url: '/SinhVien/saveDangKy',
+                        data: { cartModel: JSON.stringify(dataList2) },
+                        dataType: 'json',
+                        type: 'POST',
+                        success: function (res) {
+                            location.reload();
+                        }
+                    })
+                } else {
+                    if (res.data != null) {
+                        $("#email").val($("#email").val());
+                        $("#sdt").val($("#sdt").val());
+                        $("#loi_nhan").val($("#loi_nhan").val());
+                        var dialog = bootbox.dialog({
+                            title: "Thông báo",
+                            message: 'Hoạt động buổi đã kết thúc',
+                            buttons: {
+                                cancel: {
+                                    label: "Bỏ qua",
+                                    className: 'btn-default input-sm',
+                                    callback: function () {
+                                        location.reload();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        })
+    }
+</script>

@@ -1,0 +1,164 @@
+﻿@{
+    ViewBag.Title = "TongKetHoatDong";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using CNTT129.Models;
+@{
+    KHOA khoa = new KHOA();
+    var menu_khoa = khoa.find("", "", "0");
+    HOCKY hocky = new HOCKY();
+    var menu_hocky = hocky.find2();
+
+    var loai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_loai == "" },
+        new SelectListItem() { Value = "3", Text = "Chưa tống kết", Selected = ViewBag.selected_loai == "3" },
+        new SelectListItem() { Value = "6", Text = "Đã tổng kết", Selected = ViewBag.selected_loai == "6" },
+        new SelectListItem() { Value = "7", Text = "Từ chối tổng kết", Selected = ViewBag.selected_loai == "7" },
+    };
+
+    var khoa_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_khoa == "" },
+    };
+    foreach (var item in menu_khoa)
+    {
+        khoa_list.Add(new SelectListItem() { Value = item.ID_KHOA, Text = item.TEN_KHOA, Selected = ViewBag.selected_khoa == item.ID_KHOA });
+    }
+
+    var hoc_ky_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_khoa == "" },
+    };
+    foreach (var item in menu_hocky)
+    {
+        hoc_ky_list.Add(new SelectListItem() { Value = item.IDHK, Text = item.TENHK, Selected = ViewBag.hoc_ki == int.Parse(item.IDHK) });
+    }
+    
+}
+<div class="border-bottom-0">
+    <ul class="nav nav-tabs" id="">
+        <li class="nav-item">
+            <a id="tab-1" class="nav-link active" href="/Admin/TongKetHoatDong">Tổng kết hoạt động</a>
+        </li>
+    </ul>
+</div>
+@using (Html.BeginForm("TongKetHoatDong", "Admin", FormMethod.Post, new { @class = "" }))
+{
+    <div class="row mt-3">
+        <div class="col-md-1">
+            Mã Hoạt Động
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="ma_gv" id="ma_hd" value="@ViewBag.ma_hd" />
+        </div>
+        <div class="col-md-1">
+            Tên Hoạt Động
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="ten_gv" id="ten_hd" value="@ViewBag.ten_hd" />
+        </div>
+        <div class="col-md-1">
+            Từ ngày
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" id="start_date" name="start_date" placeholder="" value="@ViewBag.start_date" />
+        </div>
+        <div class="col-md-1">
+            Đến ngày
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" id="end_date" name="end_date" placeholder="" value="@ViewBag.end_date" />
+        </div>
+        <div class="col-md-1">
+            Loại
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="loai" name="loai" asp-items="@loai_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            Khoa
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="khoa" name="khoa" asp-items="@khoa_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            Học kỳ
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="hocky" name="hocky" asp-items="@hoc_ky_list">
+            </select>
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-1 mt-1 text-right">
+            <input class="btn btn-primary" name="find" value="Tìm" type="submit" />
+        </div>
+    </div>
+}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <td>STT</td>
+            <td>Mã</td>
+            <td>Tiêu đề</td>
+            <td>Khoa</td>
+            <td>Học kỳ</td>
+            <td>Loại</td>
+            <td>Thao tác</td>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var data = ViewData["data"];
+            if (ViewData["data"] != null)
+            {
+                int i = 1;
+                foreach (var std in ViewData["data"] as IList<CNTT129.Models.HoatDongBuoi>)
+                {
+                    DateTime ngay_dd = DateTime.Parse(std.NGAYDIEMDANH);
+                    var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                    <tr>
+                        <td>@i</td>
+                        <td>@std.MAHD</td>
+                        <td>@std.TIEUDE @datedd</td>
+                        <td>@std.name_khoa</td>
+                        <td>@std.name_hocky</td>
+                        <td>
+                            @{
+                    if (std.Trang_Thai == "3")
+                    {
+                        <span>Chưa tổng kết</span>
+                    }
+                    else if (std.Trang_Thai == "6")
+                    {
+                        <span>Đã tổng kết</span>
+                    }
+                    else
+                    {
+                        <span>Từ chối tổng kết</span>
+                    }
+}
+                        </td>
+                        <td>
+                           <a href="/Admin/ChiTietTongKet/?idbuoi=@std.IDBUOI">Chi tiết tổng kết</a>
+                        </td>
+                    </tr>
+                                    i++;
+                }
+            }
+        }
+    </tbody>
+</table>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#start_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker();
+        $('#end_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker();
+    });
+</script>

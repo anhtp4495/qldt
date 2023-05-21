@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "tb_hoat_dong";
+}
+@using CNTT129.Models;
+<div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+    <label>Hoạt động/ Quy phạm</label><br />
+</div>
+<div class="col-md-9 col-lg-9 col-xl-9 col-sm-9">
+    <select class="form-select" style="height:35px;width:100%" id="hoat_dong">
+        <option value="">Chọn loại hoạt động</option>
+        @{
+            if (ViewData["data_list"] != null)
+            {
+                foreach (var item in ViewData["data_list"] as List<HOATDONG>)
+                {
+                    DateTime NGAYBATDAU = DateTime.Parse(item.NGAY_BAT_DAU);
+                    var ngaybd = NGAYBATDAU.ToString("dd/MM/yyyy");
+                    <option value="@item.IDBUOI">@item.MAHD - @item.TIEUDE (@ngaybd) - @item.IDBUOI</option>
+                }
+            }
+        }
+    </select>
+</div>

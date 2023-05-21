@@ -1,0 +1,447 @@
+﻿@{
+    ViewBag.Title = "SuaHoatDong";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    KHOA khoa = new KHOA();
+    var menu_khoa = khoa.find("", "", "0");
+    HOCKY hocky = new HOCKY();
+    var menu_hocky = hocky.find();
+    HoatDongBuoi hdb = new HoatDongBuoi();
+    List<HoatDongBuoi> listDate = new List<HoatDongBuoi>();
+    listDate = hdb.findByID(ViewBag.id_hd);
+
+    DANGKY dkhd = new DANGKY();
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="border-bottom-0">
+            <ul class="nav nav-tabs" id="">
+                <li class="nav-item">
+                    <a id="tab-1" class="nav-link active" href="/Admin/ChiTietHoatDong/@ViewBag.id_hd">Chi tiết hoạt động</a>
+                </li>
+                <li class="nav-item">
+                    <a id="tab-2" class="nav-link" href="/Admin/DanhSachHoatDong">Danh sách hoạt động</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <label>Mã hoạt động</label>
+        <input id="id_hd" class="form-control d-none" value="@ViewBag.id_hd" />
+        <input class="form-control" id="ma_hd" name="ma_hd" placeholder="Mã hoạt động tự động tạo" readonly="readonly" value="@ViewBag.ma_hd" />
+    </div>
+    <div class="col-md-3">
+        <label>Tiêu đề hoạt động</label>
+        <input class="form-control" id="name_hd" name="name_hd" placeholder="Tên hoạt động" value="@ViewBag.tieu_de" readonly="readonly" />
+    </div>
+    <div class="col-md-2">
+        <label>Người tạo</label><br />
+        <label style="font-weight: 100; color: red">@ViewBag.nguoi_tao</label>
+    </div>
+    <div class="col-md-2">
+        <label>Số người</label>
+        <input class="form-control" id="so_nguoi_hd" name="so_nguoi_hd" placeholder="Số người tham gia" type="number" value="@ViewBag.so_nguoi" readonly="readonly" />
+    </div>
+    <div class="col-md-2">
+        <label>Điểm</label>
+        <input class="form-control" id="diem_hd" name="diem_hd" placeholder="Điểm tham gia" type="number" value="@ViewBag.diem" readonly="readonly" />
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-2">
+        <label>Ngày bắt đầu đăng ký</label><br />
+        <input class="form-control" id="ngay_bd_dk_hd" name="ngay_bd_dk_hd" placeholder="Ngày bắt đầu đăng ký" value="@ViewBag.ngay_bd" readonly="readonly" />
+    </div>
+    <div class="col-md-2">
+        <label>Ngày kết thúc đăng ký</label><br />
+        <input class="form-control" id="ngay_kt_dk_hd" name="ngay_kt_dk_hd" placeholder="Ngày kết thúc đăng ký" value="@ViewBag.ngay_kt" readonly="readonly" />
+    </div>
+    <div class="col-md-2">
+        <label>Loại hoạt động</label><br />
+        <select class="form-control" id="loai_hd" disabled>
+            @{
+                if (ViewBag.loai_hd == 1)
+                {
+                    <option value="1" selected="selected">Buổi</option>
+                }
+                else
+                {
+                    <option value="1">Buổi</option>
+                }
+
+                if (ViewBag.loai_hd == 2)
+                {
+                    <option value="2" selected="selected">Cả ngày</option>
+                }
+                else
+                {
+                    <option value="2">Cả ngày</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Khoa</label><br />
+        <select class="form-control" id="khoa" name="khoa" disabled>
+            @{
+                foreach (var item in menu_khoa)
+                {
+                    if (ViewBag.khoa == int.Parse(item.ID_KHOA))
+                    {
+                        <option value="@item.ID_KHOA" selected="selected">@item.TEN_KHOA</option>
+                    }
+                    else
+                    {
+                        <option value="@item.ID_KHOA">@item.TEN_KHOA</option>
+                    }
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Học kỳ</label><br />
+        <select class="form-control" id="hocky" name="hocky" disabled>
+            @{
+                foreach (var item in menu_hocky)
+                {
+                    if (ViewBag.hoc_ki == int.Parse(item.IDHK))
+                    {
+                        <option value="@item.IDHK" selected="selected">@item.TENHK</option>
+                    }
+                    else
+                    {
+                        <option value="@item.IDHK">@item.TENHK</option>
+                    }
+                }
+            }
+        </select>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="card-header w-100">DANH SÁCH CÁC BUỔI HOẠT ĐỘNG</div>
+    <table class="table table-bordered table-sm">
+        <tr>
+            <td>STT</td>
+            <td>NGÀY BẮT ĐẦU</td>
+            <td>BUỔI</td>
+            <td style="width:15%">SỐ NGƯỜI ĐĂNG KÝ</td>
+            <td>TRẠNG THÁI</td>
+            <td>THAO TÁC</td>
+        </tr>
+        @{
+            var i = 1;
+            foreach (var item in listDate)
+            {
+                DateTime ngay_dd = DateTime.Parse(item.NGAYDIEMDANH);
+                var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                var so_ng_dk = dkhd.DemSLNguoiDK(item.IDBUOI);
+                <tr>
+                    <td>@i</td>
+                    <td>@datedd</td>
+                    <td>
+                        @{
+                if (item.LOAI_BUOI == "1")
+                {
+                    <span>Sáng (7h-11h)</span>
+                }
+                if (item.LOAI_BUOI == "2")
+                {
+                    <span>Chiều (13h-17h)</span>
+                }
+                if (item.LOAI_BUOI == "3")
+                {
+                    <span>Tối (18h-22h)</span>
+                }
+                if (item.LOAI_BUOI == "0")
+                {
+                    <span>Cả ngày</span>
+                }
+                        }
+                    </td>
+                    <td class="text-right">
+                        @so_ng_dk/@ViewBag.so_nguoi
+                    </td>
+                    <td>
+                        @{
+                if (item.Trang_Thai == "0")
+                {
+                    <span>Đang đăng ký</span>
+                }
+                if (item.Trang_Thai == "1")
+                {
+                    <span>Hoạt động đã hủy</span>
+                }
+                if (item.Trang_Thai == "2")
+                {
+                    <span>Đã tạo mã điểm danh</span>
+                }
+                if (item.Trang_Thai == "3")
+                {
+                    <span>Đã đóng form điểm danh</span>
+                }
+                if (item.Trang_Thai == "4")
+                {
+                    <span>Đã đóng form đăng ký</span>
+                }
+                        }
+                    </td>
+                    <td>
+                        @{
+                            string? gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+                            if (quyen.getDataQuyenGV(gvID, "duyet_hoat_dong") == 1 || gvID.Equals("1"))
+                {
+                    if (ViewBag.trang_thai == 1)
+                    {
+                        if (item.Trang_Thai == "0")
+                        {
+                            <button type="button" class="btn btn-primary" onclick="dongHoatDong2(@item.IDBUOI,'@datedd',0,@item.IDHD)">Đóng form Đăng Ký</button>
+                            <button type="button" class="btn btn-danger" onclick="huyHoatDong(@item.IDBUOI,'@datedd',@so_ng_dk,@item.IDHD)">Hủy</button>
+                        }
+                        if (item.Trang_Thai == "2")
+                        {
+                            <button type="button" class="btn btn-warning" onclick="dongHoatDong(@item.IDBUOI,'@datedd',1,@item.IDHD)">Đóng form Điểm Danh</button>
+                        }
+                        if (item.Trang_Thai == "4")
+                        {
+                            <button type="button" class="btn btn-primary" onclick="taoMa(@item.IDBUOI,'@datedd')">Tạo mã</button>
+                            <button type="button" class="btn btn-danger" onclick="huyHoatDong(@item.IDBUOI,'@datedd',@so_ng_dk,@item.IDHD)">Hủy</button>
+                        }
+                    }
+                }
+
+                        }
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+    </table>
+</div>
+<div id="tb_hoat_dong">
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ngay_bd_dk_hd').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true });
+        $('#ngay_kt_dk_hd').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true });
+    })
+    function taoMa(id, ngay) {
+        var date = new Date();
+        var dateNow = new Date(date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate());
+        var ngay_bd_hd = ngay.split("/");
+        var datebd = new Date(ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0]);
+        if (datebd < dateNow) {
+            var dialog = bootbox.dialog({
+                title: "",
+                message: 'Ngày hoạt động đã qua không thể tạo mã',
+                buttons: {
+                    cancel: {
+                        label: "Bỏ qua",
+                        className: 'btn-default input-sm',
+                        callback: function () {
+                        }
+                    }
+                }
+            });
+            return;
+        }
+        if (datebd > dateNow) {
+            var dialog = bootbox.dialog({
+                title: "",
+                message: 'Ngày hoạt động chưa tới không thể tạo mã',
+                buttons: {
+                    cancel: {
+                        label: "Bỏ qua",
+                        className: 'btn-default input-sm',
+                        callback: function () {
+                        }
+                    }
+                }
+            });
+            return;
+        }
+        var dataList = [];
+        dataList.push({
+            link: location.host + '/SinhVien/DiemDanhHoatDong/?idbuoi=' + id,
+            id: id
+        });
+        $.ajax({
+            url: '/Admin/taoMaQr',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                window.open("/Admin/ShowMaQR");
+                location.reload();
+            }
+        })
+    }
+    function huyHoatDong(id, ngay, so_ng_dk, idhd) {
+        var date = new Date();
+        var dateNow = new Date(date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate());
+        var ngay_bd_hd = ngay.split("/");
+        var datebd = new Date(ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0]);
+        if (datebd == dateNow) {
+            var dialog = bootbox.dialog({
+                title: "",
+                message: 'Ngày hoạt động đang diễn ra không thể hủy',
+                buttons: {
+                    cancel: {
+                        label: "Bỏ qua",
+                        className: 'btn-default input-sm',
+                        callback: function () {
+                        }
+                    }
+                }
+            });
+            return;
+        }
+        var dataList = [];
+        dataList.push({
+            id: id,
+            idhd: idhd,
+        });
+        var title = "";
+        if (so_ng_dk == 0) {
+            title = 'Bạn có muốn Hủy hoạt động này?';
+        } else {
+            title = 'Hoạt động đã có sinh viên đăng ký. Bạn có muốn hủy ?';
+        }
+        var dialog = bootbox.dialog({
+            title: 'Hủy buổi hoạt động',
+            message: title,
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/huyHoatDong',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+    function dongHoatDong(id, ngay, form, idhd) {
+        var dataList = [];
+        dataList.push({
+            id: id,
+            trang_thai: form == 0 ? 4 : 3,
+            idhd: idhd
+        });
+        var title = "";
+        var message = "";
+        if (form == 0) {
+            title = 'Đóng form đăng ký buổi hoạt động';
+            message = 'Bạn có muốn Đóng form đăng ký hoạt động này?';
+        } else {
+            title = 'Đóng form điểm danh buổi hoạt động';
+            message = 'Bạn có muốn Đóng form điểm danh hoạt động này?';
+        }
+        var dialog = bootbox.dialog({
+            title: title,
+            message: message,
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/dongHoatDong',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+    function dongHoatDong2(id, ngay, form, idhd) {
+        $.ajax({
+            url: '/Admin/showDialogDangKy',
+            data: { id: id, idhd: idhd },
+            type: 'POST',
+            success: function (data) {
+                $("#tb_hoat_dong").html(data);
+                var _title = "Danh sách sinh viên đăng ký";
+                $('#editDivModal').modal('show');
+                $('#editDivModal #myModalLabel').html(_title);
+            }
+        });
+        //var dataList = [];
+        //dataList.push({
+        //    id: id,
+        //    trang_thai: form == 0 ? 4 : 3,
+        //    idhd: idhd
+        //});
+        //var title = "";
+        //var message = "";
+        //if (form == 0) {
+        //    title = 'Đóng form đăng ký buổi hoạt động';
+        //    message = 'Bạn có muốn Đóng form đăng ký hoạt động này?';
+        //} else {
+        //    title = 'Đóng form điểm danh buổi hoạt động';
+        //    message = 'Bạn có muốn Đóng form điểm danh hoạt động này?';
+        //}
+        //var dialog = bootbox.dialog({
+        //    title: title,
+        //    message: message,
+        //    buttons: {
+        //        ok: {
+        //            label: "Đồng ý",
+        //            className: 'btn-primary input-sm',
+        //            callback: function () {
+        //                $.ajax({
+        //                    url: '/Admin/dongHoatDong',
+        //                    data: { cartModel: JSON.stringify(dataList) },
+        //                    dataType: 'json',
+        //                    type: 'POST',
+        //                    success: function (res) {
+        //                        location.reload();
+        //                    }
+        //                })
+        //            }
+        //        },
+        //        cancel: {
+        //            label: "Bỏ qua",
+        //            className: 'btn-default input-sm',
+        //            callback: function () {
+        //                console.log('Bỏ qua');
+        //            }
+        //        }
+        //    }
+        //});
+    }
+</script>

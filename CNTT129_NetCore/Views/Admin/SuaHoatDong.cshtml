@@ -1,0 +1,485 @@
+﻿@{
+    ViewBag.Title = "SuaHoatDong";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using CNTT129.Models;
+@{
+    KHOA khoa = new KHOA();
+    var menu_khoa = khoa.find("", "", "0");
+    HOCKY hocky = new HOCKY();
+    var menu_hocky = hocky.find();
+    HoatDongBuoi hdb = new HoatDongBuoi();
+    List<HoatDongBuoi> listHD = new List<HoatDongBuoi>();
+    List<HoatDongBuoi> listDate = new List<HoatDongBuoi>();
+    if (ViewBag.loai_hd == 1)
+    {
+        listDate = hdb.findByIDGroupByDate(ViewBag.id_hd);
+        listHD = hdb.findByID(ViewBag.id_hd);
+        for (int k = 0; k < listDate.Count; k++)
+        {
+            for (int j = 0; j < listHD.Count; j++)
+            {
+                if (listDate[k].NGAYDIEMDANH == listHD[j].NGAYDIEMDANH)
+                {
+                    listDate[k].IDBUOI = listHD[j].IDBUOI;
+                    listDate[k].IDHD = listHD[j].IDBUOI;
+                    listDate[k].disabled = listHD[j].disabled;
+                    if (listHD[j].LOAI_BUOI == "1")
+                    {
+                        listDate[k].LOAI_BUOI_S = true;
+                    }
+                    if (listHD[j].LOAI_BUOI == "2")
+                    {
+                        listDate[k].LOAI_BUOI_C = true;
+                    }
+                    if (listHD[j].LOAI_BUOI == "3")
+                    {
+                        listDate[k].LOAI_BUOI_T = true;
+                    }
+                }
+
+            }
+        }
+    }
+    else
+    {
+        listDate = hdb.findByID(ViewBag.id_hd);
+    }
+
+    var loai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "1", Text = "Buổi", Selected = ViewBag.loai_hd == "1" },
+        new SelectListItem() { Value = "2", Text = "Cả ngày", Selected = ViewBag.loai_hd == "2" }
+    };
+
+    var khoa_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_khoa == "" },
+    };
+    foreach (var item in menu_khoa)
+    {
+        khoa_list.Add(new SelectListItem() { Value = item.ID_KHOA, Text = item.TEN_KHOA, Selected = ViewBag.selected_khoa == item.ID_KHOA });
+    }
+
+    var hoc_ky_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_khoa == "" },
+    };
+    foreach (var item in menu_hocky)
+    {
+        hoc_ky_list.Add(new SelectListItem() { Value = item.IDHK, Text = item.TENHK, Selected = ViewBag.hoc_ki == int.Parse(item.IDHK) });
+    }
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="border-bottom-0">
+            <ul class="nav nav-tabs" id="">
+                <li class="nav-item">
+                    <a id="tab-1" class="nav-link active" href="/Admin/ThemHoatDong">Sửa hoạt động</a>
+                </li>
+                <li class="nav-item">
+                    <a id="tab-2" class="nav-link" href="/Admin/DanhSachHoatDong">Danh sách hoạt động</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <label>Mã hoạt động</label>
+        <input id="id_hd" class="form-control d-none" value="@ViewBag.id_hd"/>
+        <input class="form-control" id="ma_hd" name="ma_hd" placeholder="Mã hoạt động tự động tạo" readonly="readonly" value="@ViewBag.ma_hd"/>
+    </div>
+    <div class="col-md-3">
+        <label>Tiêu đề hoạt động</label>
+        <input class="form-control" id="name_hd" name="name_hd" placeholder="Tên hoạt động" value="@ViewBag.tieu_de"/>
+    </div>
+    <div class="col-md-2">
+        <label>Người tạo</label><br />
+        <label style="font-weight: 100; color: red">@ViewBag.nguoi_tao</label>
+    </div>
+    @*<div class="col-md-4">
+        <label>Yêu cầu</label><br />
+        <input class="form-control" id="ghi_chu_hd" name="ghi_chu_hd" placeholder="Ghi chú hoạt động" value="@ViewBag.ghi_chu"/>
+    </div>*@
+</div>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <label>Số người</label>
+        <input class="form-control" id="so_nguoi_hd" name="so_nguoi_hd" placeholder="Số người tham gia" type="number" value="@ViewBag.so_nguoi"/>
+    </div>
+    <div class="col-md-3">
+        <label>Điểm</label>
+        <input class="form-control" id="diem_hd" name="diem_hd" placeholder="Điểm tham gia"  type="number" value="@ViewBag.diem"/>
+    </div>
+    <div class="col-md-2">
+        <label>Ngày bắt đầu đăng ký</label><br />
+        <input class="form-control" id="ngay_bd_dk_hd" name="ngay_bd_dk_hd" placeholder="Ngày bắt đầu đăng ký" value="@ViewBag.ngay_bd"/>
+    </div>
+    <div class="col-md-2">
+        <label>Ngày kết thúc đăng ký</label><br />
+        <input class="form-control" id="ngay_kt_dk_hd" name="ngay_kt_dk_hd" placeholder="Ngày kết thúc đăng ký" value="@ViewBag.ngay_kt"/>
+    </div>
+    <div class="col-md-2">
+        <label>Loại hoạt động</label><br />
+        <select class="form-control" id="loai_hd" asp-items="@loai_list">
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Đơn vị</label><br />
+        <select class="form-control" id="khoa" name="khoa" asp-items="@khoa_list">
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Học kỳ</label><br />
+        <select class="form-control" id="hocky" name="hocky" asp-items="@hoc_ky_list">
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Địa điểm</label><br />
+        <input class="form-control" id="dia_diem_hd" name="dia_diem_hd" placeholder="Địa điểm hoạt động" value="@ViewBag.dia_diem"/>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <button type="button" class="btn btn-info" id="them_ngay_bd">Thêm ngày bắt đầu</button>
+    </div>
+    <div class="col-md-9">
+        <table id="table_ngay_bd">
+            <tbody>
+                @{
+                    var i = 0;
+                    foreach (var item in listDate)
+                    {
+                        DateTime ngay_dd = DateTime.Parse(item.NGAYDIEMDANH);
+                        var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                    <tr id="row_@i">
+                        <td>
+                            <input class="form-control" id="ngay_bd_hd_@i" type="text" value="@datedd"/>
+                            <input class="form-control" type="hidden" id="delete_@i" value ="0"/>
+                        </td>
+                        @{
+                        if (ViewBag.loai_hd == 1)
+                        { 
+                            <td>
+                                <input type="checkbox" id="sang_@i" @{var check_sang = ""; if (item.LOAI_BUOI_S) { check_sang = "checked"; }}@check_sang />
+                                Sáng (7h-11h)
+                                <input type="checkbox" id="chieu_@i" @{var check_chieu = ""; if (item.LOAI_BUOI_C) { check_chieu = "checked"; }}@check_chieu/>
+                                Chiều (13h-17h)
+                                <input type="checkbox" id="toi_@i" @{var check_toi = ""; if (item.LOAI_BUOI_T) { check_toi = "checked"; }}@check_toi/>
+                                Tối (18h-22h)
+                            </td>
+                        }
+                            <td>
+                                <button type="button" class="btn btn-danger" name="xoa" value="xoa" onclick="XoaDate('@i')">Xóa</button>
+                            </td>
+                        }
+                    </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-xl-3">
+        <button type="button" class="btn btn-primary" name="them" value="them" id="themImg">Thêm Ảnh</button>
+    </div>
+    <div class="col-xl-9">
+        <table id="table_img">
+            <tbody>
+                @{
+                    if (ViewData["data_img"] != null)
+                    {
+                        var j = 0;
+                        foreach (var item in ViewData["data_img"] as string[])
+                        {
+                    <tr id="row_img_@j">
+                        <td>
+                            <input id="value_img_@j" class="form-control d-none" value="@item"/>
+                            <img src="/IMG/@item" id="img_@j" style="width: 120px; height: 120px" /></td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input hinh5" id="inputGroupFile_@j" name="" onclick="loadImg(this,@j)" data-id="@j" value="@item">
+                                    <label class="custom-file-label" for="inputGroupFile_@j">Choose file</label>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger" name="them" value="them" onclick="XoaImg(@j)" style="margin-bottom: 17px">Xóa</button></td>
+                    </tr>
+                            j++;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-6">
+        <label>Nội dung</label><br />
+        <textarea class="w-100" style="height: 400px" placeholder="nội dung" id="noi_dung">@ViewBag.noi_dung</textarea>
+    </div>
+    <div class="col-md-6">
+        <label>Yêu cầu</label><br />
+        <textarea class="w-100" style="height: 400px" placeholder="Yêu cầu" id="ghi_chu_hd"></textarea>
+        @*<input class="form-control" id="ghi_chu_hd" name="ghi_chu_hd" placeholder="Ghi chú hoạt động" />*@
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+    </div>
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-4 text-right">
+        <span id='dialog-err' class='error-msg'></span>
+    </div>
+    <div class="col-md-1 text-right">
+        <button type="button" class="btn btn-primary" name="save" value="save" id="save">Lưu</button>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ngay_bd_dk_hd').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true });
+        $('#ngay_kt_dk_hd').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true });
+        var row = $('#table_ngay_bd tr').length;
+        for (var i = 0; i < row; i++) {
+            $('#ngay_bd_hd_' + i).datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, });
+        }
+    })
+    $('#them_ngay_bd').off('click').on('click', function () {
+        var row = $('#table_ngay_bd tr').length;
+        var str = '<tr id="row_' + row + '">\
+            <td>\
+                <input class="form-control" id="ngay_bd_hd_' + row + '" type="text"/>\
+                <input class="form-control" type="hidden" id="delete_' + row + '" value ="0"/>\
+            </td>';
+        if ($('#loai_hd').val() == 1) {
+            str += ' <td>\
+                <input type="checkbox" id="sang_' + row + '"/> Sáng (7h-11h)\
+                <input type="checkbox" id="chieu_' + row + '"/> Chiều (13h-17h)\
+                <input type="checkbox" id="toi_' + row + '"/> Tối (18h-22h)\
+            </td>';
+        }
+        str += ' <td>\
+                <button type="button" class="btn btn-danger" name="xoa" value="xoa" onclick="XoaDate(' + row + ')">Xóa</button>\
+            </td></tr>';
+        $('#table_ngay_bd tbody').append(str);
+        $('#ngay_bd_hd_' + row).datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, startDate: new Date(), }).datepicker('update', new Date());
+    });
+    function XoaDate(rowDelete) {
+        $('#delete_' + rowDelete).val(1);
+        $('#row_' + rowDelete).hide();
+    }
+    $('#themImg').off('click').on('click', function () {
+        var row = $('#table_img tr').length;
+        var str = '<tr id="row_img_' + row + '"><td><input id="value_img_'+row+'" class="form-control d-none" value=""/><img src="#" id="img_' + row + '" style="width:120px;height:120px"/></td><td><div class="input-group mb-3"><div class="custom-file"><input type="file" class="custom-file-input hinh5" id="inputGroupFile_' + row + '" name="" onchange="loadImg(this,' + row + ')" data-id="' + row + '"><label class="custom-file-label" for="inputGroupFile_' + row + '">Choose file</label></div></div></td><td><button type="button" class="btn btn-danger" name="them" value="them" onclick="XoaImg(' + row + ')" style="margin-bottom: 17px">Xóa</button></td></tr>';
+        $('#table_img tbody').append(str);
+        $('#img_' + row).hide();
+    });
+
+    function XoaImg(rowDelete) {
+        var row = $('#table_img tr').length;
+        $('#row_img_' + rowDelete).remove();
+    }
+
+    function loadImg(input, row) {
+        document.getElementById("value_img_" + row).value = "";
+        if (input.files && input.files[0]) {
+            var read = new FileReader();
+            read.onload = function (e) {
+                $('#img_' + row).attr("src", e.target.result);
+            }
+            read.readAsDataURL(input.files[0]);
+            $('#img_' + row).show();
+        }
+    }
+    $('#loai_hd').on('change', function () {
+        var row = $('#table_ngay_bd tr').length;
+        var is_not_delete = 0;
+        for (var i = 0; i < row; i++) {
+            if ($('#delete_' + i).val() == 0) {
+                is_not_delete++;
+            }
+        }
+        for (var i = 0; i < row; i++) {
+            $('#row_' + i).remove();
+        }
+        for (var i = 0; i < is_not_delete; i++) {
+            var str = '<tr id="row_' + i + '">\
+            <td>\
+                <input class="form-control" id="ngay_bd_hd_' + i + '" type="text"/>\
+                <input class="form-control" type="hidden" id="delete_' + i + '" value ="0"/>\
+            </td>';
+            if ($('#loai_hd').val() == 1) {
+                str += ' <td>\
+                <input type="checkbox" id="sang_' + i + '"/> Sáng (7h-11h)\
+                <input type="checkbox" id="chieu_' + i + '"/> Chiều (13h-17h)\
+                <input type="checkbox" id="toi_' + i + '"/> Tối (18h-22h)\
+            </td>';
+            }
+            str += ' <td>\
+                <button type="button" class="btn btn-danger" name="xoa" value="xoa" onclick="XoaDate(' + i + ')">Xóa</button>\
+            </td></tr>';
+            $('#table_ngay_bd tbody').append(str);
+            $('#ngay_bd_hd_' + i).datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, startDate: new Date(), }).datepicker('update', new Date());
+        }
+    });
+
+    $('#save').off('click').on('click', function () {
+        var dateTao = new Date();
+        var date = new Date();
+        var dateNow = new Date(date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate());
+        $('#dialog-err').text("");
+        if ($('#name_hd').val() == "" || $('#so_nguoi_hd').val() == "" || $('#so_nguoi_hd').val() <= 0 || $('#diem_hd').val() == "" || $('#diem_hd').val() <= 0 || $('#noi_dung').val() == "" || $('#dia_diem_hd').val() == "") {
+            $('#dialog-err').text("Vui lòng điền đủ thông tin");
+            return;
+        }
+        var ngay_bd_dk_hd = $('#ngay_bd_dk_hd').val().split("/");
+        var ngay_kt_dk_hd = $('#ngay_kt_dk_hd').val().split("/");
+        var datebd = new Date(ngay_bd_dk_hd[2] + '/' + ngay_bd_dk_hd[1] + '/' + ngay_bd_dk_hd[0]);
+        var datekt = new Date(ngay_kt_dk_hd[2] + '/' + ngay_kt_dk_hd[1] + '/' + ngay_kt_dk_hd[0]);
+        if (datebd < dateNow || datekt < dateNow) {
+            $('#dialog-err').text("Ngày bắt đầu đăng ký hoặc ngày kết thúc nhỏ hơn ngày hiện tại");
+            return;
+        }
+        if (datebd > datekt) {
+            $('#dialog-err').text("Ngày bắt đầu nhỏ hơn ngày kết thúc");
+            return;
+        }
+        var row = $('#table_ngay_bd tr').length;
+        if (row == 0) {
+            $('#dialog-err').text("Vui lòng thêm ngày bắt đầu");
+            return;
+        }
+        for (var i = 0; i < row; i++) {
+            var ngay_bd_hd = $('#ngay_bd_hd_' + i).val().split("/");
+            var date_bd = new Date(ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0]);
+           
+        }
+        for (var i = 0; i < row; i++) {
+            var ngay_bd_hd = $('#ngay_bd_hd_' + i).val().split("/");
+            var date_bd = new Date(ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0]);
+            if (date_bd < dateNow && $('#delete_' + i).val() == 0) {
+                $('#dialog-err').text("Hiện có bắt đầu ngày nhỏ hơn ngày hiện tại");
+                return;
+            }
+            if (date_bd <= datekt && $('#delete_' + i).val() == 0) {
+                $('#dialog-err').text("Hiện có ngày bắt đầu nhỏ hơn ngày kết thúc");
+                return;
+            }
+        }
+        var data_date = [];
+        for (var i = 0; i < row; i++) {
+            var ngay_bd_hd = $('#ngay_bd_hd_' + i).val().split("/");
+            if ($('#loai_hd').val() == 1) {
+                if ($('#delete_' + i).val() == 0 && $('#sang_' + i).is(":checked") == true) {
+                    data_date.push({
+                        ngay_bat_dau: ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0],
+                        loai_buoi: 1
+                    });
+                }
+                if ($('#delete_' + i).val() == 0 && $('#chieu_' + i).is(":checked") == true) {
+                    data_date.push({
+                        ngay_bat_dau: ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0],
+                        loai_buoi: 2
+                    });
+                }
+                if ($('#delete_' + i).val() == 0 && $('#toi_' + i).is(":checked") == true) {
+                    data_date.push({
+                        ngay_bat_dau: ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0],
+                        loai_buoi: 3
+                    });
+                }
+            } else {
+                if ($('#delete_' + i).val() == 0) {
+                    data_date.push({
+                        ngay_bat_dau: ngay_bd_hd[2] + '/' + ngay_bd_hd[1] + '/' + ngay_bd_hd[0],
+                        loai_buoi: 0
+                    });
+                }
+            }
+
+        }
+        if (data_date.length == 0) {
+            if ($('#loai_hd').val() == 1) {
+                $('#dialog-err').text("Vui lòng thêm ngày bắt đầu và chọn buổi");
+            } else {
+                $('#dialog-err').text("Vui lòng thêm ngày bắt đầu");
+            }
+            return;
+        }
+        var formData = new FormData();
+        if (formData != undefined) {
+            var row_img = $('#table_img tr').length;
+            var dataImg = [];
+            var list = $('.hinh5');
+            $.each(list, function (i, item) {
+                var fileUpload = $("#inputGroupFile_" + $(item).data('id'))[0].files[0];
+                if (fileUpload == undefined) {
+                    if ($("#value_img_" + $(item).data('id')).val() != "") {
+                        dataImg.push($("#value_img_" + $(item).data('id')).val());
+                    } else {
+                        $('#dialog-err').text('Vui lòng chọn ảnh');
+                        return;
+                    }
+                } else {
+                    dataImg.push(fileUpload.name);
+                    formData.append('file', fileUpload);
+                }
+            });
+        }
+        if (dataImg.length == 0) {
+            $('#dialog-err').text('Vui lòng chọn ảnh');
+            return;
+        }
+        var dataList = [];
+        var data = {
+            id_hd: $('#id_hd').val(),
+            ten_hd: $('#name_hd').val(),
+            ghi_chu_hd: $('#ghi_chu_hd').val(),
+            so_nguoi_hd: $('#so_nguoi_hd').val(),
+            diem_hd: $('#diem_hd').val(),
+            noi_dung: $('#noi_dung').val(),
+            khoa: $('#khoa').val(),
+            loai_hd: $('#loai_hd').val(),
+            hocky: $('#hocky').val(),
+            hinh_anh: dataImg.join(","),
+            ngay_tao: dateTao.getFullYear() + '/' + (dateTao.getMonth() + 1) + '/' + dateTao.getDate(),
+            ngay_bd_dk_hd: ngay_bd_dk_hd[2] + '/' + ngay_bd_dk_hd[1] + '/' + ngay_bd_dk_hd[0],
+            ngay_kt_dk_hd: ngay_kt_dk_hd[2] + '/' + ngay_kt_dk_hd[1] + '/' + ngay_kt_dk_hd[0],
+            detail: data_date,
+            dia_diem_hd: $('#dia_diem_hd').val()
+        }
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/updateHD',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                }
+                else {
+                    $.ajax({
+                        url: "/Admin/UploadFiles",
+                        method: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                        },
+                        error: function (data) {
+                        }
+                    })
+                    location.reload();
+                }
+            }
+        })
+    });
+</script>
+

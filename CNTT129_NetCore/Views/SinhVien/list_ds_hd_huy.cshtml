@@ -1,0 +1,43 @@
+﻿@using CNTT129.Models;
+<table class="table table-sm table-hover">
+    <tbody style="position: sticky;top: 0;z-index: 0;">
+        @{
+            if (ViewData["list_ds_hd_huy"] != null)
+            {
+                var j = 1;
+                foreach (var item in ViewData["list_ds_hd_huy"] as List<DANGKY>)
+                {
+                    DateTime NGAYHUY = DateTime.Parse(item.NGAYHUY);
+                    var ngayhuy = NGAYHUY.ToString("dd/MM/yyyy");
+                    DateTime NGAYDANGKY = DateTime.Parse(item.NGAYDANGKY);
+                    var ngdk = NGAYDANGKY.ToString("dd/MM/yyyy");
+                    <tr>
+                        <td>@j</td>
+                        <td>@item.TIEUDE</td>
+                        <td>
+                            @ngdk
+                        </td>
+                        <td>@ngayhuy</td>
+                        <td>
+                            @{
+                    if (item.TRANGTHAI == "3")
+                    {
+                        <span>Không tham gia hoạt động</span>
+                    }
+                    if (item.TRANGTHAI == "2")
+                    {
+                        <span>Nhà trường hủy hoạt động</span>
+                    }
+                            }
+                        </td>
+                    </tr>
+                    j++;
+                }
+            }
+        }
+
+    </tbody>
+</table>
+
+
+

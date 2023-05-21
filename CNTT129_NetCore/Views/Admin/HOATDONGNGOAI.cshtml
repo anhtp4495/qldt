@@ -1,0 +1,476 @@
+﻿@{
+    ViewBag.Title = "HOATDONGNGOAI";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+<style>
+    .select2  {
+        width: 100% !important;
+    }
+</style>
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+    KHOA khoa = new KHOA();
+    var menu_khoa = khoa.find("", "", "0");
+    HOCKY hocky = new HOCKY();
+    var menu_hocky = hocky.find2();
+
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+    LOAI_HOAT_DONG_NGOAI lhdn = new LOAI_HOAT_DONG_NGOAI();
+
+    SINHVIEN sv = new SINHVIEN();
+
+
+    var trang_thai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected == "" },
+        new SelectListItem() { Value = "0", Text = "Chưa duyệt", Selected = ViewBag.selected == "0" },
+        new SelectListItem() { Value = "1", Text = "Đã Duyệt", Selected = ViewBag.selected == "1" },
+        new SelectListItem() { Value = "2", Text = "Đã Hủy", Selected = ViewBag.selected == "2" },
+        new SelectListItem() { Value = "3", Text = "Không Duyệt", Selected = ViewBag.selected == "3" }
+    };
+
+    var loai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_loai == "" },
+        new SelectListItem() { Value = "0", Text = "Giảng viên", Selected = ViewBag.selected_loai == "0" },
+        new SelectListItem() { Value = "1", Text = "Sinh viên", Selected = ViewBag.selected_loai == "1" },
+    };
+
+    var hoc_ky_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_hk == "" },
+    };
+    foreach (var item in menu_hocky)
+    {
+        hoc_ky_list.Add(new SelectListItem() { Value = item.IDHK, Text = item.TENHK, Selected = ViewBag.selected_hk == item.IDHK });
+    }
+
+    var lhdn_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_lhdn == "" },
+    };
+    foreach (var item in lhdn.find("", "", "0"))
+    {
+        lhdn_list.Add(new SelectListItem() { Value = item.ID_HD_NGOAI, Text = item.TEN_HD_NGOAI, Selected = ViewBag.selected_lhdn == item.ID_HD_NGOAI });
+    }
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="border-bottom-0">
+            <ul class="nav nav-tabs" id="">
+                <li class="nav-item">
+                    <a id="tab-2" class="nav-link active" href="/Admin/HOATDONGNGOAI">Danh sách hoạt động ngoài</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("HOATDONGNGOAI", "Admin", FormMethod.Post, new { @class = "" }))
+{
+    <div class="row mt-3">
+        <div class="col-md-1">
+            Mã Hoạt Động
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="ma_hd" id="ma_hd" value="@ViewBag.ma_hd" />
+        </div>
+        <div class="col-md-1">
+            Từ ngày
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" id="start_date" name="start_date" placeholder="" value="@ViewBag.start_date" />
+        </div>
+        <div class="col-md-1">
+            Đến ngày
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" id="end_date" name="end_date" placeholder="" value="@ViewBag.end_date" />
+        </div>
+        <div class="col-md-1">
+            Loại
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="loai" name="loai" asp-items="@loai_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            Trạng thái
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="trang_thai" name="trang_thai" asp-items="@trang_thai_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            Học kỳ
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="hocky" name="hocky" asp-items="@hoc_ky_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            Loại HĐ
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="lhdn" name="lhdn" asp-items="@lhdn_list">
+            </select>
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-1 mt-1 text-right">
+            @{
+    if (quyen.getDataQuyenGV(gvID, "them_hd_ngoai") == 1 || gvID.Equals("1"))
+    {
+        <input class="btn btn-primary" onclick="showFrom(0)" value="Thêm mới" type="button" />
+    }
+            }
+
+        </div>
+        <div class="col-md-1 mt-1 text-right">
+            <input class="btn btn-primary" name="find" value="Tìm" type="submit" />
+        </div>
+    </div>
+}
+<div id="list" class="mt-3">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>STT</td>
+                <td>Mã</td>
+                <td>Sinh Viên</td>
+                <td>Người tạo</td>
+                <td>Ngày tạo</td>
+                <td>Loại</td>
+                <td>Học kỳ</td>
+                <td>Loại HĐ</td>
+                <td>Trạng thái</td>
+                <td>Thao tác</td>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var data = ViewData["data"];
+                if (ViewData["data"] != null)
+                {
+                    int i = 1;
+                    foreach (var std in ViewData["data"] as IList<CNTT129.Models.HOATDONGNGOAI>)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@std.MAHD</td>
+                            <td>@std.MASV - @std.TEN2</td>
+                            <td>@std.TEN</td>
+                            <td>@std.NGAYTAO</td>
+                            <td>
+                                @{
+                        if (@std.LOAI == "0")
+                        {
+                            <span>Giảng viên</span>
+                        }
+                        else
+                        {
+                            <span>Sinh viên</span>
+                        }
+                                }
+                            </td>
+                            <td>@std.TENHK</td>
+                            <td>@std.TEN_HD_NGOAI</td>
+                            <td>
+                                @{
+                        if (@std.TRANGTHAI == "0")
+                        {
+                            <span>Chưa duyệt</span>
+                        }
+                        else if (@std.TRANGTHAI == "1")
+                        {
+                            <span>Đã duyệt</span>
+                        }
+                        else if (@std.TRANGTHAI == "2")
+                        {
+                            <span>Đã từ chối</span>
+                        }
+                        else
+                        {
+                            <span>Sinh viên hủy</span>
+                        }
+                                }
+                            </td>
+                            <td>
+                                @{
+                        if (quyen.getDataQuyenGV(gvID, "duyet_hd_ngoai") == 1 || gvID.Equals("1"))
+                        {
+                            if (@std.TRANGTHAI == "0")
+                            {
+                                <button type="button" class="btn btn-primary" onclick="huy(@std.IDHD,'@std.MAHD',1)">Duyệt</button>
+                                    <button type="button" class="btn btn-danger" onclick="huy(@std.IDHD,'@std.MAHD',2)">Từ chối</button>
+                            }
+                        }
+                        if (quyen.getDataQuyenGV(gvID, "sua_hd_ngoai") == 1 || gvID.Equals("1"))
+                        {
+                            if (@std.TRANGTHAI == "0")
+                            {
+                                <button type="button" class="btn btn-primary" onclick="showFrom(@std.IDHD)">Sửa</button>
+                            }
+                        }
+}
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                }
+            }
+        </tbody>
+    </table>
+
+</div>
+<div class="modal fade bs-example-modal-lg" id="editDivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id='editDiv' class="">
+                    <input id="id_hd" class="form-control d-none" />
+                    <div class="row">
+                        <div class="col-2">
+                            Mã
+                        </div>
+                        <div class="col-4">
+                            <input id="code_hd" class="form-control" placeholder="Mã HĐ tự động tạo" />
+                        </div>
+                        <div class="col-md-2">
+                            Loại HĐ
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control" id="lhdn_edit" name="lhdn_edit">
+                                @{
+                                    foreach (var item in lhdn.find("", "", "0"))
+                                    {
+                                        <option value="@item.ID_HD_NGOAI">@item.TEN_HD_NGOAI</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Nội dung
+                        </div>
+                        <div class="col-10">
+                           <textarea id="noi_dung" class="w-100" style="height: 120px"></textarea>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Địa Điểm
+                        </div>
+                        <div class="col-10">
+                            <textarea id="dia_diem" class="w-100" style="height: 120px"></textarea>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Sinh Viên
+                        </div>
+                        <div class="col-4">
+                            <select id="sinh_vien" class="select2 w-100">
+                                @{
+                                    foreach (var item in sv.find("0"))
+                                    {
+                                        <option value="@item.ID_SV">@item.MASV - @item.TENSV</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            Hình ảnh
+                        </div>
+                        <div class="col-4">
+                            <div class="input-group mb-3">
+                                <div class="custom-file">
+                                    <input id="value_img" class="form-control d-none" value="" />
+                                    <input type="file" class="custom-file-input hinh5" id="inputGroupFile" name="" data-id="" value="">
+                                    <label class="custom-file-label" for="inputGroupFile">Choose file</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id='dialog-err' class='error-msg'></span>
+                <button class="btn" onclick="save()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.select2').select2({
+            selectOnClose: true,
+        });
+        $('#start_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker();
+        $('#end_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker();
+    });
+</script>
+<script type="text/javascript">
+
+    function huy(id, name, trangthai) {
+        var dataList = [];
+        var date = new Date();
+        var data = {
+            ID: id+"",
+            trangthai: trangthai.toString(),
+        };
+        var title = "";
+        if (trangthai == 1) {
+            title = "Duyệt";
+        } else {
+            title = "Hủy";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' Hoạt động',
+            message: 'Bạn có muốn ' + title + ' hoạt động "' + name + '"?',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updateHdNgoaiTT',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+    function showFrom(id) {
+        $('#dialog-err').text("");
+        var dataList = [];
+        var data = {
+            id: id,
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/findHdNgoaiID',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                var _title = "Sửa Hoạt Động Ngoài";
+                $('#code_hd').val("");
+                $('#noi_dung').val("");
+                $('#dia_diem').val("");
+                $('#id_hd').val(id);
+                document.getElementById("code_hd").disabled = true;
+                if (id == "0") {
+                    _title = "Thêm mới";
+                }
+                if (res.res.length > 0) {
+                    $('#code_hd').val(res.res[0].MAHD);
+                    $('#noi_dung').val(res.res[0].NOIDUNG);
+                    $('#dia_diem').val(res.res[0].DIADIEM);
+                    $("#lhdn_edit").val(res.res[0].ID_HD_NGOAI).change();
+                    $("#sinh_vien").val(res.res[0].IDSV).change();
+                    document.getElementById("sinh_vien").disabled = true;
+                    $('#value_img').val(res.res[0].HINHANH);
+                }
+                $('#editDivModal').modal('show');
+                $('#editDivModal #myModalLabel').html(_title);
+            }
+        })
+    }
+
+    function save() {
+        var dataList = [];
+        if ($('#noi_dung').val().trim() == "" || $('#dia_diem').val().trim() == "" ) {
+            $('#dialog-err').text("Vui lòng điền đủ thông tin");
+            return;
+        }
+
+        var formData = new FormData();
+        if (formData != undefined) {
+            var dataImg = [];
+            var list = $('.hinh5');
+            $.each(list, function (i, item) {
+                var fileUpload = $("#inputGroupFile")[0].files[0];
+                if (fileUpload == undefined) {
+                    if ($("#value_img").val() != "") {
+                        dataImg.push($("#value_img").val());
+                    } else {
+                        $('#dialog-err').text('Vui lòng chọn ảnh');
+                        return;
+                    }
+                } else {
+                    dataImg.push(fileUpload.name);
+                    formData.append('file', fileUpload);
+                }
+            });
+        }
+        if (dataImg.length == 0) {
+            $('#dialog-err').text('Vui lòng chọn ảnh');
+            return;
+        }
+        var data = {
+            id_hd:  $('#id_hd').val(),
+            noi_dung: $('#noi_dung').val(),
+            dia_diem: $('#dia_diem').val(),
+            lhdn_edit: $("#lhdn_edit").val(),
+            sinh_vien: $("#sinh_vien").val(),
+            hinh_anh: dataImg.join(","),
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/saveHdNgoai2',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                } else if (res.res == 2) {
+                    $('#dialog-err').text("Mã hoạt động ngoại đã tồn tại");
+                }
+                else {
+                    $.ajax({
+                        url: "/Admin/UploadFiles",
+                        method: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                        },
+                        error: function (data) {
+                        }
+                    })
+                    location.reload();
+                    $('#editDivModal').modal('hide');
+                }
+            }
+        })
+    }
+</script>

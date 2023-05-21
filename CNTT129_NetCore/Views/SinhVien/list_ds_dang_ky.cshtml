@@ -1,0 +1,57 @@
+﻿@using CNTT129.Models;
+<table class="table table-sm">
+    <tbody style="position: sticky;top: 0;z-index: 0;">
+        @{
+            if (ViewData["list_dang_ky"] != null)
+            {
+                var i = 1;
+                foreach (var item in ViewData["list_dang_ky"] as List<DANGKY>)
+                {
+                    DateTime NGAYDANGKY = DateTime.Parse(item.NGAYDANGKY);
+                    var ngaydk = NGAYDANGKY.ToString("dd/MM/yyyy");
+                    DateTime NGAYBATDAU = DateTime.Parse(item.NGAYBATDAU);
+                    var ngdb = NGAYBATDAU.ToString("dd/MM/yyyy");
+                    <tr>
+                        <td style="width:10%">@i</td>
+                        <td style="width:26%">@item.TIEUDE</td>
+                        <td style="width:26%">@ngaydk</td>
+                        <td>
+                            @{
+                    if (item.LOAI_BUOI == "1")
+                    {
+                        <label class="form-check-label" for="flexCheckDefault">
+                            <span>Sáng (7h-11h) @ngdb</span>
+                        </label>
+                    }
+                    if (item.LOAI_BUOI == "2")
+                    {
+                        <label class="form-check-label" for="flexCheckDefault">
+                            <span>Chiều (13h-17h) @ngdb</span>
+                        </label>
+                    }
+                    if (item.LOAI_BUOI == "3")
+                    {
+                        <label class="form-check-label" for="flexCheckDefault">
+                            <span>Tối (18h-22h) @ngdb</span>
+                        </label>
+                    }
+                    if (item.LOAI_BUOI == "0")
+                    {
+                        <label class="form-check-label" for="flexCheckDefault">
+                            <span>Cả ngày @ngdb</span>
+                        </label>
+                    }
+                            }
+                        </td>
+                        <td style="width:10%"></td>
+                    </tr>
+                    i++;
+                }
+            }
+        }
+
+    </tbody>
+</table>
+
+
+

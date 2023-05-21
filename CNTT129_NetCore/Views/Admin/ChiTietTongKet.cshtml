@@ -1,0 +1,320 @@
+﻿@{
+    ViewBag.Title = "chiTietTongKetHoatDong";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using CNTT129.Models;
+@{
+    var data = ViewData["data_hoat_dong"] as List<HOATDONG>;
+    var name = "";
+    string trang_thai = "0";
+    foreach (var item in data)
+    {
+        name = item.TIEUDE;
+        DateTime ngay_dd = DateTime.Parse(item.NGAY_BAT_DAU);
+        var datedd = ngay_dd.ToString("dd/MM/yyyy");
+        if (item.LOAI == 1)
+        {
+            name += " Sáng " + datedd;
+        }
+        if (item.LOAI == 2)
+        {
+            name += " Chiều " + datedd;
+        }
+        if (item.LOAI == 3)
+        {
+            name += " Tối " + datedd;
+        }
+        if (item.LOAI == 0)
+        {
+            name += " Cả ngày " + datedd;
+        }
+        trang_thai = item.trang_thai_buoi;
+    }
+}
+<div class="text-center w-100">
+    <h1>TỔNG KẾT HOẠT ĐỘNG "@name"</h1>
+</div>
+<div class="row">
+    <div class="col-3" style="overflow-y: auto;height:400px">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <td colspan="3" class="text-center">DANH SÁCH SINH VIÊN ĐĂNG KÝ</td>
+                </tr>
+                <tr>
+                    <td>STT</td>
+                    <td>MASV</td>
+                    <td>Họ Tên</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var i = 1;
+                    var sum_dk = ViewData["data_dang_ky"] as List<DANGKY>;
+                    foreach (var item in ViewData["data_dang_ky"] as List<DANGKY>)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@item.MASV</td>
+                            <td>@item.TENSV</td>
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-3" style="overflow-y: auto;height:400px">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <td colspan="3" class="text-center">DANH SÁCH SINH VIÊN ĐĂNG KÝ HỦY</td>
+                </tr>
+                <tr>
+                    <td>STT</td>
+                    <td>MASV</td>
+                    <td>Họ Tên</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var j = 1;
+                    var sum_dk_huy = ViewData["data_dang_ky_huy"] as List<DANGKY>;
+                    foreach (var item in ViewData["data_dang_ky_huy"] as List<DANGKY>)
+                    {
+                        <tr>
+                            <td>@j</td>
+                            <td>@item.MASV</td>
+                            <td>@item.TENSV</td>
+                        </tr>
+                        j++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-3" style="overflow-y: auto;height:400px">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <td colspan="3" class="text-center">DANH SÁCH SINH VIÊN KHÔNG THAM GIA</td>
+                </tr>
+                <tr>
+                    <td>STT</td>
+                    <td>MASV</td>
+                    <td>Họ Tên</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var n = 1;
+                    var sum_dk_ktg = ViewData["data_dang_ky_khong_tham_gia"] as List<DANGKY>;
+                    foreach (var item in ViewData["data_dang_ky_khong_tham_gia"] as List<DANGKY>)
+                    {
+                        <tr>
+                            <td>@n</td>
+                            <td>@item.MASV</td>
+                            <td>@item.TENSV</td>
+                        </tr>
+                        n++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-3" style="overflow-y: auto;height:400px">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <td colspan="3" class="text-center">DANH SÁCH SINH VIÊN ĐÃ ĐIỂM DANH</td>
+                </tr>
+                <tr>
+                    <td>STT</td>
+                    <td>MASV</td>
+                    <td>Họ Tên</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var m = 1;
+                    var sum_dk_diem_danh = ViewData["data_diem_danh"] as List<DIEMDANH>;
+                    foreach (var item in ViewData["data_diem_danh"] as List<DIEMDANH>)
+                    {
+                        <tr>
+                            <td>@m</td>
+                            <td>@item.MASV</td>
+                            <td>@item.TENSV</td>
+                        </tr>
+                        m++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <table class="table table-sm">
+            <tfoot>
+                <tr>
+                    <td>Tổng cộng:</td>
+                    <td class="text-right" colspan="2">@sum_dk.Count</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="col-3">
+        <table class="table table-sm">
+            <tfoot>
+                <tr>
+                    <td>Tổng cộng:</td>
+                    <td class="text-right" colspan="2">@sum_dk_huy.Count</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="col-3">
+        <table class="table table-sm">
+            <tfoot>
+                <tr>
+                    <td>Tổng cộng:</td>
+                    <td class="text-right" colspan="2">@sum_dk_ktg.Count</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="col-3">
+        <table class="table table-sm">
+            <tfoot>
+                <tr>
+                    <td>Tổng cộng:</td>
+                    <td class="text-right">@sum_dk_diem_danh.Count</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12" style="overflow-y: auto;height:400px">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <td colspan="6" class="text-center">DANH SÁCH SINH VIÊN GỬI PHẢN HỒI</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>STT</td>
+                    <td>MASV</td>
+                    <td>Họ Tên</td>
+                    <td>Nội dung</td>
+                    <td>Hình ảnh</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var k = 1;
+                    var sum_dk_phan_hoi = ViewData["data_phan_hoi"] as List<PHAN_HOI>;
+                    foreach (var item in ViewData["data_phan_hoi"] as List<PHAN_HOI>)
+                    {
+                        var checkeds = "";
+                        var disb = "";
+                        if (item.TRANGTHAI == "1")
+                        {
+                            checkeds = "checked";
+                            disb = "disabled";
+                        }
+                        if (item.TRANGTHAI == "2")
+                        {
+                            disb = "disabled";
+                        }
+                        <tr>
+                            <td><input type="checkbox" id="chk_@k" @checkeds @disb value="@item.ID_PHAN_HOI" /></td>
+                            <td>@k</td>
+                            <td>@item.MASV</td>
+                            <td>@item.TENSV</td>
+                            <td>@item.NOIDUNG</td>
+                            <td>
+                                @{
+                        string[] list_img = item.TEP.Split(new char[] { ',' });
+                        foreach (var item_hinh in list_img)
+                        {
+                            <img style="width:80px;height:80px" src="~/IMG/@item_hinh" />
+                        }
+                                }
+                            </td>
+                        </tr>
+                        k++;
+                    }
+                }
+            </tbody>
+        </table>
+        <table class="table table-sm">
+            <tfoot>
+                <tr>
+                    <td colspan="2">Tổng cộng:</td>
+                    <td class="text-right" colspan="4">@sum_dk_phan_hoi.Count</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-10">
+
+    </div>
+    <div class="col-2">
+        @if (trang_thai == "3")
+        {
+            <button type="button" class="btn btn-info" onclick="saveFn(@k)">Tổng kết</button>
+            <button type="button" class="btn btn-danger" onclick="saveDeleteFn(@k)">Từ chối Tổng kết</button>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    function saveFn(k) {
+        var id = @ViewBag.id_buoi;
+        var list_duyet = [];
+        var list_huy = [];
+        for (var i = 0; i < k-1; i++) {
+            if (document.getElementById("chk_"+(i+1)).checked == true) {
+                list_duyet.push(document.getElementById("chk_"+(i+1)).value);
+            } else {
+                list_huy.push(document.getElementById("chk_"+(i+1)).value);
+            }
+        }
+        var data = {
+            id_buoi: id,
+            list_duyet: list_duyet,
+            list_huy: list_huy
+        };
+        var  dataList = [];
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/tongKetHD',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                location.reload();
+            }
+        })
+    }
+    function saveDeleteFn(k) {
+        var id = @ViewBag.id_buoi;
+        var data = {
+            id_buoi: id,
+        };
+        var  dataList = [];
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/tuChoiTongKetHD',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                location.reload();
+            }
+        })
+    }
+</script>

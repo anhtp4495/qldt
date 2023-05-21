@@ -1,0 +1,253 @@
+﻿@{
+    ViewBag.Title = "LoaiQuyen";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using CNTT129.Models;
+@{
+    var trang_thai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected == "" },
+        new SelectListItem() { Value = "0", Text = "Chưa khóa", Selected = ViewBag.selected == "0" },
+        new SelectListItem() { Value = "1", Text = "Đã khóa", Selected = ViewBag.selected == "1" }
+    };
+}
+<div class="border-bottom-0">
+    <ul class="nav nav-tabs" id="">
+        <li class="nav-item">
+            <a id="tab-1" class="nav-link active" href="/Admin/LOAIQUYEN">Danh mục loại quyền</a>
+        </li>
+    </ul>
+</div>
+@using (Html.BeginForm("LoaiQuyen", "Admin", FormMethod.Post, new { @class = "" }))
+{
+    <div class="row mt-3">
+        <div class="col-md-1">
+            Mã loại quyền
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="loai_quyen_code" id="loai_quyen_code" value="@ViewBag.vai_tro_code"/>
+        </div>
+        <div class="col-md-1">
+            Tên loại quyền
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="loai_quyen_name" id="loai_quyen_name" value="@ViewBag.vai_tro_name"/>
+        </div>
+        <div class="col-md-1">
+            Trạng thái
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="trang_thai" name="trang_thai" asp-items="@trang_thai_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            <input class="btn btn-primary form-control" name="find" value="Tìm" type="submit" />
+        </div>
+    </div>
+}
+<div class="row mt-2">
+    <div class="col-md-4 text-right">
+    </div>
+    <div class="col-md-4 text-right">
+    </div>
+    <div class="col-md-4 text-right">
+        <button class="btn btn-primary" id="them" onclick="showFromLoaiQuyen(0)">Thêm mới</button>
+    </div>
+</div>
+<div id="khung" class=" mt-2">
+    <div id="list">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>STT</td>
+                    <td>Mã</td>
+                    <td>Tên</td>
+                    <td>Trạng thái</td>
+                    <td>Thao tác</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var data = ViewData["data"];
+                    if (ViewData["data"] != null)
+                    {
+                        int i = 1;
+                        foreach (var std in ViewData["data"] as IList<CNTT129.Models.LOAI_QUYEN>)
+                        {
+                    <tr>
+                        <td>@i</td>
+                        <td>@std.CODE_LOAI_QUYEN</td>
+                        <td>@std.TEN_LOAI_QUYEN</td>
+                        <td>
+                            @{
+                            if (std.disabled == 0)
+                            {
+                                <span>Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span>Đã khóa</span>
+                            }
+                            }
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="showFromLoaiQuyen(@std.ID_LOAI_QUYEN)">Sửa</button>
+                            @{
+                            if (std.disabled == 0)
+                            {
+                                <button type="button" class="btn btn-danger" onclick="showFromDisbledLoaiQuyen(@std.ID_LOAI_QUYEN,'@std.TEN_LOAI_QUYEN.ToString()',1)">Khóa</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-success" onclick="showFromDisbledLoaiQuyen(@std.ID_LOAI_QUYEN,'@std.TEN_LOAI_QUYEN.ToString()',0)">Mở khóa</button>
+                            }
+                            }
+                        </td>
+                    </tr>
+                            i++;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="editDivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id='editDiv' class="">
+                    <input id="id_lq" class="form-control d-none" />
+                    <div class="row">
+                        <div class="col-2">
+                            Mã Loại Quyền
+                        </div>
+                        <div class="col-4">
+                            <input id="ma_lq" class="form-control" placeholder="Nhập mã loại quyền" />
+                        </div>
+                        <div class="col-2">
+                            Tên Loại Quyền
+                        </div>
+                        <div class="col-4">
+                            <input id="ten_lq" class="form-control" placeholder="Nhập tên loại quyền" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id='dialog-err' class='error-msg'></span>
+                <button class="btn" onclick="save()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showFromLoaiQuyen(id) {
+        $('#dialog-err').text("");
+        var dataList = [];
+        var data = {
+            ID_LOAI_QUYEN: id,
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/findLoaiQuyen',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                var _title = "Sửa vai trò";
+                $('#ten_lq').val("");
+                $('#ma_lq').val("");
+                document.getElementById("ma_lq").disabled = true;
+                $('#id_lq').val(id);
+                if (id == 0) {
+                    _title = "Thêm mới";
+                    document.getElementById("ma_lq").disabled = false;
+                }
+                if (res.res.length > 0) {
+                    $('#ten_lq').val(res.res[0].TEN_LOAI_QUYEN);
+                    $('#ma_lq').val(res.res[0].CODE_LOAI_QUYEN);
+                }
+                $('#editDivModal').modal('show');
+                $('#editDivModal #myModalLabel').html(_title);
+            }
+        })
+    }
+    function save() {
+        var dataList = [];
+        if ($('#ten_lq').val().trim() == "" || $('#ma_lq').val().trim() == "") {
+            $('#dialog-err').text("Vui lòng điền đủ thông tin");
+            return;
+        }
+        var data = {
+            TEN_LOAI_QUYEN: $('#ten_lq').val(),
+            CODE_LOAI_QUYEN: $('#ma_lq').val(),
+            ID_LOAI_QUYEN: $('#id_lq').val(),
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/saveLQ',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                } else if (res.res == 2) {
+                    $('#dialog-err').text("Mã vai trò đã tồn tại");
+                }
+                else {
+                    location.reload();
+                    $('#editDivModal').modal('hide');
+                }
+            }
+        })
+    }
+    function showFromDisbledLoaiQuyen(id, name, disabled) {
+        var dataList = [];
+        var data = {
+            ID_LOAI_QUYEN: id,
+            disabled: disabled.toString()
+        };
+        var title = "";
+        if (disabled == 0) {
+            title = "Khóa";
+        } else {
+            title = "Mở khóa";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' vai trò',
+            message: 'Bạn có muốn ' + title + ' vai trò "' + name + '"?',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updateLQ',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+</script>

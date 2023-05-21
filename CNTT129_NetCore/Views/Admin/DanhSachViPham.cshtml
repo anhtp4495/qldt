@@ -1,0 +1,190 @@
+﻿@{
+    ViewBag.Title = "DanhSachViPham";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+    HOCKY hoc_ky = new HOCKY();
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+
+    var trang_thai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected == "" },
+        new SelectListItem() { Value = "0", Text = "Chưa duyệt", Selected = ViewBag.selected == "0" },
+        new SelectListItem() { Value = "1", Text = "Đã Duyệt", Selected = ViewBag.selected == "1" },
+        new SelectListItem() { Value = "2", Text = "Đã Hủy", Selected = ViewBag.selected == "2" },
+        new SelectListItem() { Value = "3", Text = "Không Duyệt", Selected = ViewBag.selected == "3" }
+    };
+
+    var loai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_Loai == "" },
+        new SelectListItem() { Value = "1", Text = "Hoạt Động", Selected = ViewBag.selected_Loai == "1" },
+        new SelectListItem() { Value = "2", Text = "Vi Phạm", Selected = ViewBag.selected_Loai == "2" },
+    };
+
+    var hoc_ky_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_hk == "" },
+    };
+    foreach (var item in hoc_ky.find2())
+    {
+        hoc_ky_list.Add(new SelectListItem() { Value = item.IDHK, Text = item.TENHK, Selected = ViewBag.selected_hk == item.IDHK });
+    }
+}
+<div class="border-bottom-0">
+    <ul class="nav nav-tabs" id="">
+        <li class="nav-item">
+            <a id="tab-1" class="nav-link active" href="/Admin/DanhSachViPham">Danh sách vi phạm</a>
+        </li>
+    </ul>
+</div>
+@using (Html.BeginForm("DanhSachViPham", "Admin", FormMethod.Post, new { @class = "" }))
+{
+    <div class="row mt-3">
+        <div class="col-md-1">
+            Mã vi phạm
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="ma_vi_pham" id="ma_vi_pham" value="@ViewBag.ma_vi_pham" />
+        </div>
+        <div class="col-md-1">
+            Mã sinh viên
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="masv" id="masv" value="@ViewBag.masv" />
+        </div>
+        <div class="col-md-1">
+            Trạng thái
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="trang_thai" name="trang_thai" asp-items="@trang_thai_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            Học kỳ
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="hoc_ky" name="hoc_ky" asp-items="@hoc_ky_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            <input class="btn btn-primary" name="find" value="Tìm" type="submit" />
+        </div>
+    </div>
+}
+<div id="khung" class=" mt-2">
+    <div id="list">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>STT</td>
+                    <td>Mã Vi Phạm</td>
+                    <td>Mã Sinh Viên</td>
+                    <td>Tên Sinh Viên</td>
+                    <td>Tên nội quy</td>
+                    <td>Điểm</td>
+                    <td>Trạng thái</td>
+                    <td>Thao tác</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var data = ViewData["data"];
+                    if (ViewData["data"] != null)
+                    {
+                        int i = 1;
+                        foreach (var std in ViewData["data"] as IList<CNTT129.Models.VI_PHAM>)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@std.MA_VI_PHAM</td>
+                                <td>@std.MASV</td>
+                                <td>@std.TENSV</td>
+                                <td>@std.TENNQ</td>
+                                <td>@std.DIEM</td>
+                                <td>
+                                    @{
+                            if (std.TRANGTHAI == "0")
+                            {
+                                <span>Chưa xử lý</span>
+                            }
+                            else if (std.TRANGTHAI == "1")
+                            {
+                                <span>Đã duyệt</span>
+                            }
+                            else
+                            {
+                                <span>Đã từ chối</span>
+                            }
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                            if (quyen.getDataQuyenGV(gvID, "duyet_vi_pham") == 1 || gvID.Equals("1"))
+                            {
+                                if (std.TRANGTHAI == "0")
+                                {
+                                    <button type="button" class="btn btn-danger" onclick="showFromDisbledViPham(@std.ID_VI_PHAM,'@std.MA_VI_PHAM.ToString()',1)">Duyệt </button>
+                                        <button type="button" class="btn btn-success" onclick="showFromDisbledViPham(@std.ID_VI_PHAM,'@std.MA_VI_PHAM.ToString()',2)">Hủy</button>
+                                }
+                            }
+                                    }
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    function showFromDisbledViPham(id, name, disabled) {
+        var dataList = [];
+        var data = {
+            ID_VI_PHAM: id,
+            disabled: disabled.toString()
+        };
+        var title = "";
+        if (disabled == 1) {
+            title = "Duyệt";
+        } else {
+            title = "Hủy";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' Vi phạm',
+            message: 'Bạn có muốn ' + title + ' Vi phạm "' + name + '"?',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updateVP',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+</script>

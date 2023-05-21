@@ -1,0 +1,245 @@
+﻿@{
+    ViewBag.Title = "DanhSachPhanHoi";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@{
+    ViewBag.Title = "Llist_Phan_Hoi";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+    HOCKY hoc_ky = new HOCKY();
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+    var trang_thai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected == "" },
+        new SelectListItem() { Value = "0", Text = "Chưa duyệt", Selected = ViewBag.selected == "0" },
+        new SelectListItem() { Value = "1", Text = "Đã Duyệt", Selected = ViewBag.selected == "1" },
+        new SelectListItem() { Value = "2", Text = "Đã Hủy", Selected = ViewBag.selected == "2" },
+        new SelectListItem() { Value = "3", Text = "Không Duyệt", Selected = ViewBag.selected == "3" }
+    };
+
+    var loai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_Loai == "" },
+        new SelectListItem() { Value = "1", Text = "Hoạt Động", Selected = ViewBag.selected_Loai == "1" },
+        new SelectListItem() { Value = "2", Text = "Vi Phạm", Selected = ViewBag.selected_Loai == "2" },
+    };
+
+    var hoc_ky_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_hk == "" },
+    };
+    foreach (var item in hoc_ky.find2())
+    {
+        hoc_ky_list.Add(new SelectListItem() { Value = item.IDHK, Text = item.TENHK, Selected = ViewBag.selected_hk == item.IDHK });
+    }
+}
+<div class="border-bottom-0">
+    <ul class="nav nav-tabs" id="">
+        <li class="nav-item">
+            <a id="tab-1" class="nav-link active" href="/Admin/DanhSachPhanHoi">Danh sách phản hồi</a>
+        </li>
+    </ul>
+</div>
+<div class="card">
+    <div class="card-body">
+        @using (Html.BeginForm("DanhSachPhanHoi", "Admin", FormMethod.Post, new { @class = "" }))
+        {
+            <div class="row mt-3">
+                <div class="col-md-1">
+                    Mã Phản Hồi
+                </div>
+                <div class="col-md-2">
+                    <input class="form-control" name="ma_ph" id="ma_ph" value="@ViewBag.ma_ph" />
+                </div>
+                <div class="col-md-1">
+                    Mã SV
+                </div>
+                <div class="col-md-2">
+                    <input class="form-control" name="ma_sv" id="ma_sv" value="@ViewBag.ma_sv" />
+                </div>
+                <div class="col-md-1">
+                    Từ ngày
+                </div>
+                <div class="col-md-2">
+                    <input class="form-control" id="start_date" name="start_date" placeholder="" value="@ViewBag.start_date" />
+                </div>
+                <div class="col-md-1">
+                    Đến ngày
+                </div>
+                <div class="col-md-2">
+                    <input class="form-control" id="end_date" name="end_date" placeholder="" value="@ViewBag.end_date" />
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-1">
+                    Trạng thái
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" id="trang_thai" name="trang_thai" asp-items="@trang_thai_list">
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    Loại
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" id="loai" name="loai" asp-items="@loai_list">
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    Học kỳ
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" id="hoc_ky" name="hoc_ky" asp-items="@hoc_ky_list">
+                    </select>
+                </div>
+                <div class="col-md-1">
+                </div>
+                <div class="col-md-1">
+                    <input class="btn btn-primary form-control" name="find" value="Tìm" type="submit" />
+                </div>
+            </div>
+        }
+
+        <table class="table table-bordered mt-2">
+            <thead>
+                <tr class="bg-primary" style="color:white;">
+                    <td>STT</td>
+                    <td>MÃ PH</td>
+                    <td>TIÊU ĐỀ</td>
+                    <td>MÃ SV</td>
+                    <td>TÊN SV</td>
+                    <td>NGÀY TẠO</td>
+                    <td>Nội Dung</td>
+                    <td>IDHD/IDVIPHAM</td>
+                    <td>NGÀY</td>
+                    <td>NGƯỜI DUYỆT</td>
+                    <td>NGÀY DUYỆT</td>
+                    <td>TRẠNG THÁI</td>
+                    <td>THAO TÁC</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    if (ViewData["list_phan_hoi"] != null)
+                    {
+                        var i = 1;
+                        foreach (var item in ViewData["list_phan_hoi"] as List<PHAN_HOI>)
+                        {
+                            DateTime NGAYTAO = DateTime.Parse(item.NGAYTAO);
+                            var ngayd = "";
+                            if (item.NGAYDUYET != null && item.NGAYDUYET != "")
+                            {
+                                DateTime NGAYDUYET = DateTime.Parse(item.NGAYDUYET);
+                                ngayd = NGAYDUYET.ToString("dd/MM/yyyy");
+                            }
+                            var ngaytao = NGAYTAO.ToString("dd/MM/yyyy");
+                            DateTime NGAY = DateTime.Parse(item.NGAY);
+                            var ngay = NGAY.ToString("dd/MM/yyyy");
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.MA_PHAN_HOI</td>
+                                <td>@item.TIEUDE</td>
+                                <td>@item.MASV</td>
+                                <td>@item.TENSV</td>
+                                <td>@ngaytao</td>
+                                <td>@item.NOIDUNG</td>
+                                <td>@item.MA</td>
+                                <td>@ngay</td>
+                                <td>@item.NGUOIDUYET</td>
+                                <td>@ngayd</td>
+                                <td>
+                                    @if (@item.TRANGTHAI == "0")
+                                    {
+                                        <span>Chưa duyệt</span>
+                                    }
+                                    @if (@item.TRANGTHAI == "1")
+                                    {
+                                        <span>Đã duyệt</span>
+                                    }
+                                    @if (@item.TRANGTHAI == "3")
+                                    {
+                                        <span>Sinh viên đã hủy</span>
+                                    }
+                                    @if (@item.TRANGTHAI == "2")
+                                    {
+                                        <span>Từ chối</span>
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        if (quyen.getDataQuyenGV(gvID, "duyet_phan_hoi") == 1 || gvID.Equals("1"))
+                            {
+                                if (@item.TRANGTHAI == "0")
+                                {
+                                    <button type="button" class="btn btn-success" onclick="huy(@item.ID_PHAN_HOI,'@item.MA_PHAN_HOI',1)">Duyệt</button>
+                                        <button type="button" class="btn btn-danger" onclick="huy(@item.ID_PHAN_HOI,'@item.MA_PHAN_HOI',2)">Từ chối</button>
+                                }
+                            }
+                                    }
+                                    
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#start_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker();
+        $('#end_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker();
+    });
+    function huy(id, name, trang_thai) {
+        var dataList = [];
+        var data = {
+            ID: id + "",
+            tt: trang_thai + ""
+        };
+        var title = "";
+        if (trang_thai == 1) {
+            title = "Duyệt";
+        }
+        if (trang_thai == 2) {
+            title = "Từ chối";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' phản hồi',
+            message: 'Bạn có muốn ' + title + ' phản hồi ' + name + '"?',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updatePhanHoi',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+</script>

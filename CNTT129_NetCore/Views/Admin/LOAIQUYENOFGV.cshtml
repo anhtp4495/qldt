@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "LOAIQUYENOFGV";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using CNTT129.Models;
+@{
+    LOAIQUYENOFGV sp = new LOAIQUYENOFGV();
+    var quyen = ViewBag.ID_VAI_TRO;
+    var ma = ViewBag.ID_GV;
+}
+<button type="button" class="btn btn-outline-danger a" data-toggle="modal" onclick="luuquyennv('@quyen.Replace(" ", "")','@ma.Replace(" ", "")')">
+    Lưu
+</button>
+<div class="row">
+    <div class="col-xl-6">
+        <h1>LOẠI QUYỀN CÓ TRONG GIẢNG VIÊN</h1>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <td></td>
+                    <td>Mã</td>
+                    <td>Tên</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var menu = sp.dsDaCoQuyen(ma, quyen);
+                    if (menu.Count > 0)
+                    {
+                        foreach (var item in menu)
+                        {
+                    <tr>
+                        <td>
+                            <input type="checkbox" checked="checked" data-id="@item.ID"disabled/></td>
+                        <td>@item.Ma</td>
+                        <td>@item.Ten</td>
+                    </tr> 
+                        }
+                    }
+                }
+                @{
+                    var menu4 = sp.dsDaCoQuyen2(ma, quyen);
+                    if (menu4.Count > 0)
+                    {
+                        foreach (var item in menu4)
+                        {
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="chkyes" checked="checked" data-id="@item.ID"/></td>
+                        <td>@item.Ma</td>
+                        <td>@item.Ten</td>
+                    </tr> 
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-xl-6">
+        <h1>LOẠI QUYỀN CHƯA CÓ TRONG QUYỀN</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td></td>
+                    <td>Mã</td>
+                    <td>Tên</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var menu2 = sp.dsChuaCoQuyen(ma);
+                    if (menu2.Count > 0)
+                    {
+                        foreach (var item in menu2)
+                        {
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="chkbo" data-id="@item.ID"/></td>
+                        <td>@item.Ma</td>
+                        <td>@item.Ten</td>
+                    </tr> 
+                        }
+                    }
+                }
+                @{
+                    var menu3 = sp.dsChuaCoQuyen2(ma);
+                    if (menu3.Count > 0)
+                    {
+                        foreach (var item in menu3)
+                        {
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="chkthem" data-id="@item.ID"/></td>
+                        <td>@item.Ma</td>
+                        <td>@item.Ten</td>
+                    </tr> 
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    function luuquyennv(id, manv) {
+        var listSpCo = $('.chkyes');
+        var listCo = [];
+        $.each(listSpCo, function (i, item) {
+            if (item.checked == false) {
+                listCo.push(
+                   $(item).data('id')
+                );
+            }
+        });
+        var listSpBo = $('.chkbo');
+        var listBo = [];
+        $.each(listSpBo, function (i, item) {
+            if (item.checked == true) {
+                listBo.push(
+                    $(item).data('id')
+                );
+            }
+        });
+        var listSpThem = $('.chkthem');
+        var listThem = [];
+        $.each(listSpThem, function (i, item) {
+            if (item.checked == true) {
+                listThem.push(
+                    $(item).data('id')
+                );
+            }
+        });
+        var dataList = [];
+        var data = {
+            listThem: listThem,
+            listBo: listBo,
+            listCo: listCo,
+            id: manv,
+        };
+        dataList.push(data);
+        if (listCo.length == 0 && listThem.length == 0 && listBo.length == 0) {
+            return;
+        }
+        $.ajax({
+            url: '/Admin/CNLOAIQUYENOFGV',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.status == true) {
+                    window.location.href = "/Admin/LOAIQUYENOFGV/" + manv + "?ma_vai_tro=" + id;
+                }
+            }
+        })
+    }
+</script>

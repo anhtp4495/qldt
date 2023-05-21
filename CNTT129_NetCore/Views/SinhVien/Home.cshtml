@@ -1,0 +1,498 @@
+﻿@{
+    ViewBag.Title = "View1";
+    Layout = "~/Views/Shared/_Layout_SinhVien.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string id_sv = HttpContextAccessor.HttpContext.Session.Get<string>("id_sv");
+    SINHVIEN sv = new SINHVIEN();
+    List<SINHVIEN> listSv = new List<SINHVIEN>();
+    listSv = sv.findByID2(int.Parse(id_sv));
+
+    HOATDONG hoatdong = new HOATDONG();
+
+    List<HOATDONG> listHD = new List<HOATDONG>();
+    listHD = hoatdong.findBy(2);
+
+    HOCKY hocky = new HOCKY();
+    var menu_hocky = hocky.find2();
+
+
+    DANGKY dang_ky = new DANGKY();
+    DIEMDANH diem_danh = new DIEMDANH();
+
+}
+<style>
+    .bold {
+        font-weight: 600;
+    }
+
+    .icon-menu {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border: 1px inset black;
+    }
+
+    .highcharts-exporting-group, .highcharts-credits {
+        display: none;
+    }
+</style>
+<div class="row mt-2">
+    <div class="col-sm-12 col-md-7 col-lg-7 col-xl-7">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="portlet-title" style="opacity:0.7;font-weight:700;font-size:18px">Thông tin sinh viên</h5>
+                <hr />
+                @{
+                    foreach (var item in listSv)
+                    {
+                        DateTime date = DateTime.Parse(item.NGAYSINH);
+                        var ngay_sinh = date.ToString("dd/MM/yyyy");
+                        <div class="row">
+                            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 text-center">
+                                <div style="max-height:125px">
+                                    <img src="~/IMG/@item.HINHANH" class="rounded-circle" alt="Cinque Terre" style="width: 110px;height: 122px;margin-bottom: 30px;">
+                                </div>
+                                <div class="mt-2">
+                                    <a href="" class="color-active mt-3" lang="db-chitiet-button">Xem chi tiết</a>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8 mt-3">
+                                <div class="row">
+                                    <label class="col-sm-6 col-md-6 col-lg-6 col-xl-6 col-6"><span lang="sv-mssv">MSSV</span>: <span class="bold">@item.MASV</span></label>
+                                    <label class="col-sm-6 col-md-6 col-lg-6 col-xl-6 col-6"><span lang="sv-lophoc">Lớp học</span>: <span class="bold">@item.CODE_LOP</span></label>
+                                    <label class="col-sm-6 col-md-6 col-lg-6 col-xl-6 col-6"><span lang="sv-hoten">Họ tên</span>: <span class="bold">@item.TENSV</span></label>
+                                    <label class="col-sm-6 col-md-6 col-lg-6 col-xl-6 col-6">
+                                        <span lang="sv-gioitinh">Giới tính</span>: @{
+                        if (@item.GIOITINH == "0")
+                        {
+                            <span class="bold">Nam</span>
+                        }
+                        else
+                        {
+                            <span class="bold">Nữ</span>
+                        }
+                                        }
+                                    </label>
+                                    <label class="col-sm-6 col-md-6 col-lg-6 col-xl-6 col-6"><span lang="sv-hedaotao">Ngày sinh</span>: <span class="bold">@ngay_sinh</span></label>
+                                    <label class="col-sm-6 col-md-6 col-lg-6 col-xl-6 col-6">
+                                        <span lang="sv-hedaotao">Bậc đào tạo</span>:
+                                        @{
+                        if (@item.BAC_DAO_TAO == "0")
+                        {
+                            <span class="bold">ĐẠI HỌC</span>
+                        }
+                        else if (@item.BAC_DAO_TAO == "1")
+                        {
+                            <span class="bold">Thạc sĩ</span>
+                        }
+                        else
+                        {
+                            <span class="bold">Tiến sĩ</span>
+                        }
+                                        }
+
+                                    </label>
+                                    <label class="col-sm-6 col-md-6 col-lg-6 col-xl-6 col-6"><span lang="sv-noisinh">Nơi sinh</span>: <span class="bold">@item.NOISINH</span></label>
+                                    <label class="col-sm-6 col-md-6 col-lg-6 col-xl-6 col-6"><span lang="sv-noisinh">Khoa</span>: <span class="bold">@item.TEN_KHOA</span></label>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-5 col-lg-5 col-xl-5" style="max-height:270px">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="portlet-title" style="opacity:0.7;font-size:12px;">Hoạt động mới</h3>
+                <div class="row">
+                    <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10 col-10">
+                        <div class="number" style="width:110px !important;font-size:30px;opacity:0.7;">@hoatdong.findCountHD()</div>
+                    </div>
+                    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-2 text-right" style="width:110px !important;font-size:15px;opacity:0.7;padding-top:8px">
+                        <div class="text-center">
+                            <span class="icon-menu rounded-circle"><i class="fa fa-bell-o" aria-hidden="true"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div style="height:105px">
+                    <div style="height:90px">
+                        @{
+                            foreach (var item in listHD)
+                            {
+                                DateTime date2 = DateTime.Parse(item.NGAYDUYET);
+                                var ngayduyet = date2.ToString("dd/MM/yyyy");
+                                <div class="mt-2">
+                                    <div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                        <a href="/SinhVien/ChiTietHoatDong/?idhd=@item.IDHD.ToString()" style="color: black;font-size:14px">@item.TIEUDE - @item.NOIDUNG</a>
+                                    </div>
+                                    <div class="w-100 text-right" style="color:red;font-weight:600;opacity:0.7;font-size:11px">@ngayduyet</div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="w-100 text-right">
+                        <a href="/SinhVien/TinTuc" class="color-active" lang="db-chitiet-button">Xem thêm</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-sm-12 col-md-12 col-lg-5 col-xl-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-7 mt-2">
+                        <h5 class="portlet-title" style="opacity:0.7;font-weight:700;font-size:18px">Hoạt động đã đăng ký</h5>
+                    </div>
+                    <div class="col-5">
+                        <select class="form-select" style="height:35px;width:100%" onchange="changeHdDaDangKy()" id="hk_dk">
+                            <option value="">Chọn học kỳ</option>
+                            @{
+                                foreach (var item in menu_hocky)
+                                {
+                                    <option value="@item.IDHK">@item.TENHK</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <hr />
+                <table class="table table-sm">
+                    <thead>
+                        <tr class="table-primary">
+                            <td class="text-left" style="width:10%">STT</td>
+                            <td class="text-left" style="width:25%">Hoạt động</td>
+                            <td class="text-left" style="width:25%">Ngày đăng ký</td>
+                            <td class="text-left">Ngày bắt đầu</td>
+                            <td class="text-left" style="width:10%"></td>
+                        </tr>
+                    </thead>
+                </table>
+                <div id="list_ds_dang_ky" style="height:224px;overflow-y: auto;">
+                    <table class="table table-sm">
+                        <tbody style="position: sticky;top: 0;z-index: 0;">
+                            @{
+                                if (ViewData["list_dang_ky"] != null)
+                                {
+                                    var i = 1;
+                                    foreach (var item in ViewData["list_dang_ky"] as List<DANGKY>)
+                                    {
+                                        DateTime NGAYDANGKY = DateTime.Parse(item.NGAYDANGKY);
+                                        var ngaydk = NGAYDANGKY.ToString("dd/MM/yyyy");
+                                        DateTime NGAYBATDAU = DateTime.Parse(item.NGAYBATDAU);
+                                        var ngdb = NGAYBATDAU.ToString("dd/MM/yyyy");
+                                        <tr>
+                                            <td style="width:10%">@i</td>
+                                            <td style="width:26%">
+                                                <label style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;width:80px">
+                                                    @item.TIEUDE
+                                                </label>
+                                            </td>
+                                            <td style="width:26%">@ngaydk</td>
+                                            <td>
+                                                @{
+                                        if (item.LOAI_BUOI == "1")
+                                        {
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                <span>Sáng (7h-11h) @ngdb</span>
+                                            </label>
+                                        }
+                                        if (item.LOAI_BUOI == "2")
+                                        {
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                <span>Chiều (13h-17h) @ngdb</span>
+                                            </label>
+                                        }
+                                        if (item.LOAI_BUOI == "3")
+                                        {
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                <span>Tối (18h-22h) @ngdb</span>
+                                            </label>
+                                        }
+                                        if (item.LOAI_BUOI == "0")
+                                        {
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                <span>Cả ngày @ngdb</span>
+                                            </label>
+                                        }
+                                                }
+                                            </td>
+                                            <td style="width:10%"></td>
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="w-100 text-right mt-3">
+                    <a href="/SinhVien/TinhThamGiaHDCuaSV" class="color-active" lang="db-chitiet-button">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-sm-none d-none d-md-block col-lg-3 col-xl-3" style="max-height:242px">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 mt-2">
+                        <h5 class="portlet-title" style="opacity:0.7;font-weight:700;font-size:18px">Hoạt động đã tham gia</h5>
+                    </div>
+                </div>
+                <hr />
+                <div id="container123" class="w-100"></div>
+                <div class="form-check mt-1">
+                    <label class="form-check-label" for="flexCheckDefault" style="margin-left:15px;border:inset 1px #0099FF;width:10px;height:10px;background-color:#0099FF"></label>
+                    <label style="padding-left:10px"> Hoạt động đã đăng ký</label><br />
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label" for="flexCheckDefault" style="margin-left:15px;border:inset 1px #33CC66;width:10px;height:10px;background-color:#33CC66"></label>
+                    <label style="padding-left:10px"> Hoạt động đã Tham gia</label><br />
+                </div>
+                <div class="w-100 text-center mt-1">
+                    <label style="font-size:14px;font-weight:600">@diem_danh.layDsSvDaThamGia(id_sv)/@dang_ky.layDanhSachHDSvDaDK(id_sv)</label>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-12 col-lg-4 col-xl-4" style="max-height:242px">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-7 mt-2">
+                        <h5 class="portlet-title" style="opacity:0.7;font-weight:700;font-size:18px">Hoạt động đã hủy</h5>
+                    </div>
+                    <div class="col-5">
+                        <select class="form-select" style="height:35px;width:100%" onchange="changeHdDaHuy()" id="hk_huy">
+                            <option value="">Chọn học kỳ</option>
+                            @{
+                                foreach (var item in menu_hocky)
+                                {
+                                    <option value="@item.IDHK">@item.TENHK</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <hr />
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr class="table-primary">
+                            <td>STT</td>
+                            <td>Hoạt động</td>
+                            <td>Ngày đăng ký</td>
+                            <td>Ngày hủy</td>
+                            <td>Ghi chú</td>
+                        </tr>
+                    </thead>
+                </table>
+                <div id="list_ds_hd_huy" style="height:224px;overflow-y: auto;">
+                    <table class="table table-sm table-hover">
+                        <tbody style="position: sticky;top: 0;z-index: 0;">
+                            @{
+                                if (ViewData["list_ds_hd_huy"] != null)
+                                {
+                                    var j = 1;
+                                    foreach (var item in ViewData["list_ds_hd_huy"] as List<DANGKY>)
+                                    {
+                                        DateTime NGAYHUY = DateTime.Parse(item.NGAYHUY);
+                                        var ngayhuy = NGAYHUY.ToString("dd/MM/yyyy");
+                                        DateTime NGAYDANGKY = DateTime.Parse(item.NGAYDANGKY);
+                                        var ngdk = NGAYDANGKY.ToString("dd/MM/yyyy");
+                                        <tr>
+                                            <td>@j</td>
+                                            <td>
+                                                <label style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;width:70px">
+                                                    @item.TIEUDE
+                                                </label>
+                                            </td>
+                                            <td>
+                                                @ngdk
+                                            </td>
+                                            <td>@ngayhuy</td>
+                                            <td style="width:270px">
+                                                @{
+                                        if (item.TRANGTHAI == "3")
+                                        {
+                                            <span>Không tham gia</span>
+                                        }
+                                        if (item.TRANGTHAI == "2")
+                                        {
+                                            <span>Nhà trường hủy</span>
+                                        }
+                                        if (item.TRANGTHAI == "4")
+                                        {
+                                            <span>Sinh viên tự hủy</span>
+                                        }
+                                        if (item.TRANGTHAI == "5")
+                                        {
+                                            <span>Sinh viên không đủ chỉ tiêu</span>
+                                        }
+}
+                                            </td>
+                                        </tr>
+                                        j++;
+                                    }
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="w-100 text-right mt-3">
+                    <a href="/SinhVien/TinhThamGiaHDCuaSV" class="color-active" lang="db-chitiet-button">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script type="text/javascript">
+    if (!Highcharts.theme) {
+        Highcharts.setOptions({
+            chart: {
+                backgroundColor: 'white'
+            },
+            colors: ['#0099FF', '#33CC66', '#33CC66'],
+        });
+    }
+    var so_dk =  @dang_ky.layDanhSachHDSvDaDK(id_sv);
+    var so_tham_gia =  @diem_danh.layDsSvDaThamGia(id_sv)
+
+    Highcharts.chart('container123', {
+        chart: {
+            type: 'solidgauge',
+            height: '100%',
+        },
+
+        title: {
+            text: 'Hoạt động đã tham gia',
+            style: {
+                fontSize: '24px',
+                display: 'none'
+            }
+        },
+
+        tooltip: {
+        },
+
+        pane: {
+            startAngle: 0,
+            endAngle: 360,
+            background: [{ // Track for Move
+                outerRadius: '112%',
+                innerRadius: '88%',
+                backgroundColor: Highcharts.color(Highcharts.getOptions().colors[0])
+                    .setOpacity(0.3)
+                    .get(),
+                borderWidth: 0
+            }, { // Track for Exercise
+                outerRadius: '87%',
+                innerRadius: '63%',
+                backgroundColor: Highcharts.color(Highcharts.getOptions().colors[1])
+                    .setOpacity(0.3)
+                    .get(),
+                borderWidth: 0
+            }]
+        },
+
+        yAxis: {
+            min: 0,
+            max: 100,
+            lineWidth: 0,
+            tickPositions: []
+        },
+
+        plotOptions: {
+            solidgauge: {
+                dataLabels: {
+                    enabled: false
+                },
+                linecap: 'round',
+                stickyTracking: false,
+                rounded: true
+            }
+        },
+        series: [{
+            name: 'Hoạt động đã đăng ký: @dang_ky.layDanhSachHDSvDaDK(id_sv)',
+            data: [{
+                color: Highcharts.getOptions().colors[0],
+                radius: '112%',
+                innerRadius: '88%',
+                y: 100
+            }]
+        }, {
+            name: 'Hoạt động đã hoàn thành @diem_danh.layDsSvDaThamGia(id_sv)',
+            data: [{
+                color: Highcharts.getOptions().colors[1],
+                radius: '87%',
+                innerRadius: '63%',
+                y: (so_tham_gia/so_dk)*100,
+            }]
+        }, ]
+    });
+
+</script>
+<script type="text/javascript">
+    function changeHdDaDangKy() {
+        var id_hk = document.getElementById("hk_dk").value;
+        $.ajax({
+            url: '/SinhVien/layDanhSachSVDangKyTheoHocKy',
+            data: { id_hk: id_hk,id_sv: @id_sv },
+            type: 'POST',
+            success: function (data) {
+                $("#list_ds_dang_ky").html(data);
+            }
+        });
+        var id_hk = document.getElementById("hk_huy").value;
+        $.ajax({
+            url: '/SinhVien/layDanhSachSVHuyTheoHocKy',
+            data: { id_hk: id_hk,id_sv: @id_sv },
+            type: 'POST',
+            success: function (data) {
+                $("#list_ds_hd_huy").html(data);
+            }
+        });
+    }
+    function changeHdDaHuy() {
+        var id_hk = document.getElementById("hk_huy").value;
+        $.ajax({
+            url: '/SinhVien/layDanhSachSVHuyTheoHocKy',
+            data: { id_hk: id_hk,id_sv: @id_sv },
+            type: 'POST',
+            success: function (data) {
+                $("#list_ds_hd_huy").html(data);
+            }
+        });
+        var id_hk = document.getElementById("hk_dk").value;
+        $.ajax({
+            url: '/SinhVien/layDanhSachSVDangKyTheoHocKy',
+            data: { id_hk: id_hk,id_sv: @id_sv },
+            type: 'POST',
+            success: function (data) {
+                $("#list_ds_dang_ky").html(data);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,119 @@
+﻿@{
+    ViewBag.Title = "dialogDangKy";
+}
+@using CNTT129.Models;
+@{
+    DANGKY dang_ky = new DANGKY();
+}
+<div class="modal fade bs-example-modal-lg" id="editDivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id='editDiv' class="">
+                    <input id="id_buoi" class="form-control d-none" value="@ViewBag.id_buoi" />
+                    <input id="id_hd" class="form-control d-none" value="@ViewBag.id_hd" />
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">STT</th>
+                                <th scope="col">MASV</th>
+                                <th scope="col">Họ tên</th>
+                                <th scope="col">Lời nhắn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var i = 1;
+                                var j = 0;
+                                var count = ViewData["data_list_dang_ky"] as List<DANGKY>;
+                                foreach (var item in ViewData["data_list_dang_ky"] as List<DANGKY>)
+                                {
+                                    <tr>
+                                        <td><input type="checkbox" checked="checked" id="chk_@j" value="@item.IDDK" /></td>
+                                        <th scope="row">@i</th>
+                                        <td>@item.MASV</td>
+                                        <td>@item.TENSV</td>
+                                        <td>@item.GHICHU</td>
+                                    </tr>
+                                    i++;
+                                    j++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id='dialog-err' class='error-msg'></span>
+                <button class="btn" onclick="savedk()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function savedk() {
+        $('#dialog-err').text("");
+        var count = @count.Count();
+        var data_no_check = [];
+        var data_yes_check = [];
+        for (var i = 0; i < count; i++) {
+            if (document.getElementById("chk_"+i).checked == false) {
+                data_no_check.push(document.getElementById("chk_"+i).value);
+            } else {
+                data_yes_check.push(document.getElementById("chk_"+i).value);
+            }
+        }
+        if (data_yes_check.length == 0) {
+            $('#dialog-err').text("Vui lòng chọn vài sinh viên để tham gia");
+            return;
+        }
+        if (data_no_check.length > 0) {
+            $.ajax({
+                url: '/Admin/khongchapnhansvthamgia',
+                data: { cartModel: JSON.stringify(data_no_check) },
+                dataType: 'json',
+                type: 'POST',
+                success: function (res) {
+                    var dataList = [];
+                    dataList.push({
+                        id: document.getElementById("id_buoi").value,
+                        trang_thai: 4,
+                        idhd: document.getElementById("id_hd").value
+                    });
+                    var title = "";
+                    $.ajax({
+                        url: '/Admin/dongHoatDong2',
+                        data: { cartModel: JSON.stringify(dataList) },
+                        dataType: 'json',
+                        type: 'POST',
+                        success: function (res) {
+                            location.reload();
+                        }
+                    })
+                }
+            })
+        } else {
+            var dataList = [];
+            dataList.push({
+                id: document.getElementById("id_buoi").value,
+                trang_thai: 4,
+                idhd: document.getElementById("id_hd").value
+            });
+            var title = "";
+            $.ajax({
+                url: '/Admin/dongHoatDong2',
+                data: { cartModel: JSON.stringify(dataList) },
+                dataType: 'json',
+                type: 'POST',
+                success: function (res) {
+                    location.reload();
+                }
+            })
+        }
+    }
+</script>

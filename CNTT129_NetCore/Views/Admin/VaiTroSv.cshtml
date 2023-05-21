@@ -1,0 +1,292 @@
+﻿@{
+    ViewBag.Title = "VaiTro";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+
+    var trang_thai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected == "" },
+        new SelectListItem() { Value = "0", Text = "Chưa khóa", Selected = ViewBag.selected == "0" },
+        new SelectListItem() { Value = "1", Text = "Đã khóa", Selected = ViewBag.selected == "1" }
+    };
+}
+<div class="border-bottom-0">
+    <ul class="nav nav-tabs" id="">
+        <li class="nav-item">
+            <a id="tab-1" class="nav-link active" href="/Admin/VAITROSV">Danh mục vai trò sinh viên</a>
+        </li>
+    </ul>
+</div>
+@using (Html.BeginForm("VaiTroSv", "Admin", FormMethod.Post, new { @class = "" }))
+{
+    <div class="row mt-3">
+        <div class="col-md-1">
+            Mã vai trò
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="vai_tro_code" id="vai_tro_code" value="@ViewBag.vai_tro_code" />
+        </div>
+        <div class="col-md-1">
+            Tên vai trò
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="vai_tro_name" id="vai_tro_name" value="@ViewBag.vai_tro_name" />
+        </div>
+        <div class="col-md-1">
+            Trạng thái
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="trang_thai" name="trang_thai" asp-items="@trang_thai_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            <input class="btn btn-primary form-control" name="find" value="Tìm" type="submit" />
+        </div>
+    </div>
+}
+<div class="row mt-2">
+    <div class="col-md-4 text-right">
+    </div>
+    <div class="col-md-4 text-right">
+    </div>
+    <div class="col-md-4 text-right">
+        @{
+            if (quyen.getDataQuyenGV(gvID, "them_moi_vai_tro_sv") == 1 || gvID.Equals("1"))
+            {
+                <button class="btn btn-primary" id="them" onclick="showFromVaiTro(0)">Thêm mới</button>
+            }
+        }
+    </div>
+</div>
+<div id="khung" class=" mt-2">
+    <div id="list">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>STT</td>
+                    <td>Mã</td>
+                    <td>Tên</td>
+                    <td>Trạng thái</td>
+                    <td>Thao tác</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var data = ViewData["data"];
+                    if (ViewData["data"] != null)
+                    {
+                        int i = 1;
+                        foreach (var std in ViewData["data"] as IList<CNTT129.Models.VAI_TRO_SV>)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@std.CODE_VAI_TRO</td>
+                                <td>@std.TEN_VAI_TRO</td>
+                                <td>
+                                    @{
+                            if (std.disabled == 0)
+                            {
+                                <span>Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span>Đã khóa</span>
+                            }
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                            if (quyen.getDataQuyenGV(gvID, "sua_vai_tro") == 1 || gvID.Equals("1"))
+                            {
+                                <button type="button" class="btn btn-primary" onclick="showFromVaiTro(@std.ID_VAI_TRO)">Sửa</button>
+                            }
+                                    }
+
+                                    @{
+                            if (std.disabled == 0)
+                            {
+                                if (quyen.getDataQuyenGV(gvID, "khoa_mo_vai_tro_sv") == 1 || gvID.Equals("1"))
+                                {
+                                    <button type="button" class="btn btn-danger" onclick="showFromDisbledVaiTro(@std.ID_VAI_TRO,'@std.TEN_VAI_TRO.ToString()',1)">Khóa</button>
+                                }
+                            }
+                            else
+                            {
+                                if (quyen.getDataQuyenGV(gvID, "khoa_mo_vai_tro_sv") == 1 || gvID.Equals("1"))
+                                {
+                                    <button type="button" class="btn btn-success" onclick="showFromDisbledVaiTro(@std.ID_VAI_TRO,'@std.TEN_VAI_TRO.ToString()',0)">Mở khóa</button>
+                                }
+                            }
+                            if (quyen.getDataQuyenGV(gvID, "them_vai_tro_sv") == 1 || gvID.Equals("1"))
+                            {
+                                <a href="/Admin/ThemSvVaoVt/?id_vt=@std.ID_VAI_TRO">Thêm sinh viên</a>
+                            }
+                                    }
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="editDivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id='editDiv' class="">
+                    <input id="id_vt" class="form-control d-none" />
+                    <div class="row">
+                        <div class="col-2">
+                            Mã VT
+                        </div>
+                        <div class="col-4">
+                            <input id="ma_vt" class="form-control" placeholder="Nhập mã vai trò" />
+                        </div>
+                        <div class="col-2">
+                            Tên VT
+                        </div>
+                        <div class="col-4">
+                            <input id="ten_vt" class="form-control" placeholder="Nhập tên vai trò" />
+                        </div>
+                        <div class="col-2 mt-2">
+                            ĐIỂM CỘNG
+                        </div>
+                        <div class="col-4  mt-2">
+                            <input id="diem" class="form-control" placeholder="Nhập điểm cộng" type="number"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id='dialog-err' class='error-msg'></span>
+                <button class="btn" onclick="save()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showFromVaiTro(id) {
+        $('#dialog-err').text("");
+        var dataList = [];
+        var data = {
+            ID_VAI_TRO: id,
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/findVaiTroSv',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                var _title = "Sửa vai trò";
+                $('#ten_vt').val("");
+                $('#ma_vt').val("");
+                document.getElementById("ma_vt").disabled = true;
+                $('#id_vt').val(id);
+                if (id == 0) {
+                    _title = "Thêm mới";
+                    document.getElementById("ma_vt").disabled = false;
+                }
+                if (res.res.length > 0) {
+                    $('#ten_vt').val(res.res[0].TEN_VAI_TRO);
+                    $('#ma_vt').val(res.res[0].CODE_VAI_TRO);
+                    $('#diem').val(res.res[0].DIEM);
+                }
+                $('#editDivModal').modal('show');
+                $('#editDivModal #myModalLabel').html(_title);
+            }
+        })
+    }
+    function save() {
+        var dataList = [];
+        if ($('#ten_vt').val().trim() == "" || $('#ma_vt').val().trim() == "" || $('#diem').val() == "") {
+            $('#dialog-err').text("Vui lòng điền đủ thông tin");
+            return;
+        }
+        if ($('#diem').val() <= 0) {
+            $('#dialog-err').text("Vui lòng nhập điểm lớn hơn không");
+            return;
+        }
+        var data = {
+            TEN_VAI_TRO: $('#ten_vt').val(),
+            CODE_VAI_TRO: $('#ma_vt').val(),
+            ID_VAI_TRO: $('#id_vt').val(),
+            DIEM: $('#diem').val()
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/saveVTSv',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                } else if (res.res == 2) {
+                    $('#dialog-err').text("Mã vai trò đã tồn tại");
+                }
+                else {
+                    location.reload();
+                    $('#editDivModal').modal('hide');
+                }
+            }
+        })
+    }
+    function showFromDisbledVaiTro(id, name, disabled) {
+        var dataList = [];
+        var data = {
+            ID_VAI_TRO: id,
+            disabled: disabled.toString()
+        };
+        var title = "";
+        if (disabled == 0) {
+            title = "Khóa";
+        } else {
+            title = "Mở khóa";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' vai trò',
+            message: 'Bạn có muốn ' + title + ' vai trò "' + name + '"?',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updateVTSv',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+</script>

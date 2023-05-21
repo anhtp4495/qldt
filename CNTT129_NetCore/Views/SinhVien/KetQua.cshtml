@@ -1,0 +1,164 @@
+﻿@{
+    ViewBag.Title = "KetQua";
+    Layout = "~/Views/Shared/_Layout_SinhVien.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string id_sv = HttpContextAccessor.HttpContext.Session.Get<string>("id_sv");
+    HOATDONG hoat_dong = new HOATDONG();
+    KETQUA ket_qua = new KETQUA();
+    VI_PHAM vi_pham = new VI_PHAM();
+    HOATDONGNGOAI hoat_dong_ngoai = new HOATDONGNGOAI();
+}
+<div class="card">
+    <div class="card-body">
+        <h2>Kết quả rèn luyện</h2>
+        <hr />
+        <div style="overflow-y:auto">
+            <table class="table table-bordered">
+                <thead>
+                    <tr style="color:white" class="table-primary">
+                        <th>STT</th>
+                        <th>Mã HĐ/Mã VP</th>
+                        <th>Tên HĐ/Tên VP</th>
+                        <th>Ngày HĐ/TÊN VP</th>
+                        <th>Hình thức</th>
+                        <th>Ghi chú</th>
+                        <th>Điểm cộng/trừ</th>
+                    </tr>
+                </thead>
+                @{
+                    foreach (var item in ViewData["data"] as List<HOCKY>)
+                    {
+                        var sum = 0;
+                        <tbody>
+                            <tr>
+                                <td colspan="7" style="font-weight:1000;" class="text-primary">@item.TENHK</td>
+                            </tr>
+                            @{
+                        var i = 1;
+                        foreach (var item_detail in hoat_dong.showKetQua(id_sv, item.IDHK))
+                        {
+                            DateTime ngay_dd = DateTime.Parse(item_detail.NGAY_BAT_DAU);
+                            var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                            <tr>
+                                <td>@i</td>
+                                <td>@item_detail.MAHD</td>
+                                <td>@item_detail.TIEUDE</td>
+                                <td>
+                                    @{
+                            if (item_detail.LOAI_BUOI == "1")
+                            {
+                                <span>Sáng (7h-11h)</span>
+                            }
+                            if (item_detail.LOAI_BUOI == "2")
+                            {
+                                <span>Chiều (13h-17h)</span>
+                            }
+                            if (item_detail.LOAI_BUOI == "3")
+                            {
+                                <span>Tối (18h-22h)</span>
+                            }
+                            if (item_detail.LOAI_BUOI == "0")
+                            {
+                                <span>Cả ngày</span>
+                            }
+                                    }
+                                    @datedd
+                                </td>
+                                <td>@item_detail.HINH_THUC</td>
+                                <td>@item_detail.GHICHU</td>
+                                <td class="text-right">@item_detail.DIEMRL</td>
+                            </tr>
+                            i++;
+                        }
+                            }
+                            @{
+                        var j = 1;
+                        foreach (var item_detail in vi_pham.showKetQua(id_sv, item.IDHK))
+                        {
+                            DateTime ngay_dd = DateTime.Parse(item_detail.NGAYTAO);
+                            var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                            <tr>
+                                <td>@j</td>
+                                <td>@item_detail.MA_VI_PHAM</td>
+                                <td>@item_detail.TIEUDE</td>
+                                <td>@datedd</td>
+                                <td>@item_detail.HINH_THUC</td>
+                                <td>@item_detail.NOIDUNG</td>
+                                <td class="text-right">@item_detail.DIEM</td>
+                            </tr>
+                            j++;
+                        }
+                            }
+                            @{
+                        var k = 1;
+                        foreach (var item_detail in hoat_dong_ngoai.showKetQua(id_sv, item.IDHK))
+                        {
+                            DateTime ngay_dd = DateTime.Parse(item_detail.NGAYTAO);
+                            var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                            <tr>
+                                <td>@k</td>
+                                <td>@item_detail.MAHD</td>
+                                <td>@item_detail.TEN_HD_NGOAI</td>
+                                <td>@datedd</td>
+                                <td>@item_detail.HINH_THUC</td>
+                                <td>@item_detail.NOIDUNG</td>
+                                <td class="text-right">@item_detail.DIEM</td>
+                            </tr>
+                            k++;
+                        }
+                            }
+                            <tr>
+                                <td class="text-center" colspan="3" style="color: #fad10d">Điểm rèn luyện</td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-right">@{int diem2 = ket_qua.ketQuaSV(id_sv, item.IDHK) > 100 ? 100 : ket_qua.ketQuaSV(id_sv, item.IDHK);} @diem2</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" colspan="3" style="color: #fad10d">Xếp loại</td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-right">
+                                    @{
+                        int diem = ket_qua.ketQuaSV(id_sv, item.IDHK);
+                        if (diem < 35)
+                        {
+                            <span>Kém</span>
+                        }
+                        else if (diem < 50)
+                        {
+                            <span>Yếu</span>
+                        }
+                        else if (diem < 65)
+                        {
+                            <span>Trung bình</span>
+                        }
+                        else if (diem < 80)
+                        {
+                            <span>Khá</span>
+                        }
+                        else if (diem < 90)
+                        {
+                            <span>Tốt</span>
+                        }
+                        else
+                        {
+                            <span>Xuất sắc</span>
+                        }
+
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    }
+                }
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,352 @@
+﻿@{
+    ViewBag.Title = "ChiTietHoatDong";
+    Layout = "~/Views/Shared/_Layout_SinhVien.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string id_sv = HttpContextAccessor.HttpContext.Session.Get<string>("id_sv");
+    HOATDONG hoatdong = new HOATDONG();
+    HoatDongBuoi hdb = new HoatDongBuoi();
+    List<HoatDongBuoi> listDate = new List<HoatDongBuoi>();
+    listDate = hdb.findByID(ViewBag.id_hd);
+    SINHVIEN sv = new SINHVIEN();
+    List<SINHVIEN> listSv = new List<SINHVIEN>();
+    listSv = sv.findByID2(int.Parse(id_sv));
+
+    List<HOATDONG> listHD = new List<HOATDONG>();
+    listHD = hoatdong.findBy(5);
+
+    DIEMDANH diemDanh = new DIEMDANH();
+    var checkDiemDanh = diemDanh.ktTraSvDiemDanh(ViewBag.idbuoi, id_sv);
+}
+<style>
+    .filter-report-info {
+        border: 1px solid #81b2dc;
+        border-radius: 5px;
+        margin-bottom: 0;
+        background: #f4f8fb;
+    }
+
+    .legend-info {
+        font-weight: bold;
+        color: #0351b5;
+        margin-bottom: 0;
+    }
+</style>
+@{
+    if (checkDiemDanh > 0)
+    {
+        <div class="row mt-2">
+            <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+            </div>
+            <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h1>@ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd</h1>
+
+                        <span class="mt-3">
+                            Biểu mẫu điểm danh @ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd. Bãn đã điểm danh.
+                        </span><br />
+                        <span>
+                            Hãy thử liên hệ với chủ sở hữu của biểu mẫu nếu bạn cho rằng đây là một sự nhầm lẫn.
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+            </div>
+        </div>
+    }
+    else
+    {
+        if (ViewBag.trang_thai_buoi == "2")
+        {
+            <div class="row mt-2">
+                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2"></div>
+                <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="w-100 text-center">
+                                <h2>FORM ĐIỂM DANH</h2>
+                            </div>
+                            <h6 style="text-transform:uppercase">@ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd</h6>
+                            <fieldset class="filter-report-info">
+                                <legend class="legend-info">Thông tin hoạt động:</legend>
+                                <div class="mb-2 mt-2" style="margin-left:10px">
+                                    <span>Nội dung công việc: </span><span style="font-weight:800">@ViewBag.noi_dung</span><br />
+                                    <span>Số lượng sinh viên:</span><span style="font-weight:800"> @ViewBag.so_nguoi sinh viên</span><br />
+                                    <span>
+                                        Điểm: <span style="font-weight:800">
+                                            @ViewBag.diem điểm/
+                                            @{
+            if (ViewBag.loai_hd == 1)
+            {
+                <span>Buổi</span>
+            }
+            else
+            {
+                <span>Cả ngày</span>
+            }
+                                            }
+                                        </span>
+                                    </span><br />
+                                    <span>Địa điểm: </span><span style="font-weight:800">@ViewBag.dia_diem</span><br />
+                                    <span>Yêu cầu: </span><span style="font-weight:800">@ViewBag.ghi_chu</span><br />
+                                    <span>Thời gian:</span><br />
+                                    <div style="margin-left:10px;font-weight:800">
+                                        @{
+            foreach (var item in listDate)
+            {
+                DateTime ngay_dd = DateTime.Parse(item.NGAYDIEMDANH);
+                var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                if (item.LOAI_BUOI == "1")
+                {
+                    <span>Sáng (7h-11h) - @datedd</span><br />
+                }
+                if (item.LOAI_BUOI == "2")
+                {
+                    <span>Chiều (13h-17h) - @datedd </span><br />
+                }
+                if (item.LOAI_BUOI == "3")
+                {
+                    <span>Tối (18h-22h) - @datedd</span><br />
+                }
+                if (item.LOAI_BUOI == "0")
+                {
+                    <span>Cả ngày- @datedd</span><br />
+                }
+            }
+                                        }
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset class="filter-report-info">
+                                <legend class="legend-info">Thông tin điểm danh:</legend>
+                                <div style="margin-left:10px;margin-bottom:10px">
+                                    @{
+            foreach (var item in listSv)
+            {
+                <div class="w-100 mt-1">
+                    <label>Mã sinh viên</label><br />
+                    <span style="font-weight:800" id="masv">@item.MASV</span><br />
+                </div>
+                                        <div class="w-100 mt-1">
+                                            <label>Họ và tên</label><br />
+                                            <span style="font-weight:800" id="tensv">@item.TENSV</span><br />
+                                        </div>
+                                        <div class="w-100 mt-1">
+                                            <label>Email</label><br />
+                                            <span style="font-weight:800" id="emailsv">@item.email</span><br />
+                                        </div>
+                                        <div class="w-100 mt-1">
+                                            <label>Điện thoại</label><br />
+                                            <span style="font-weight:800" id="sdtsv">@item.SDT</span><br />
+                                        </div>
+            }
+                                    }
+                                    <hr />
+                                    <div class="row">
+                                        <div class="col-sm-6 col-lg-6 col-md-6 col-xl-6" style="border-right: 1px inset black">
+                                            <h6>Thông tin liên lạc khác</h6>
+                                            <div class="w-100 mt-1">
+                                                <label>Email</label><br />
+                                                <input class="form-control form-control-sm w-50" id="email" name="email" placeholder="Email" />
+                                            </div>
+                                            <div class="w-100 mt-1">
+                                                <label>SDT</label><br />
+                                                <input class="form-control form-control-sm w-50" id="sdt" name="sdt" placeholder="Số điện thoại" />
+                                            </div>
+                                            <div class="w-100 mt-1">
+                                                <label>Lời nhắn</label><br />
+                                                <textarea class="form-control form-control-sm w-75" style="height:80px" id="loi_nhan"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="w-100 text-center mt-2">
+                                            <div>
+                                                @{
+            var idsv = id_sv;
+                                                }
+                                                <span id='dialog-err' class='error-msg'></span>
+                                                <button type="button" class="btn btn-success" onclick="save(@idsv,'@ViewBag.idbuoi')">GỬI THÔNG TIN</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2"></div>
+            </div>
+        }
+        else if (ViewBag.trang_thai_buoi == "4" || ViewBag.trang_thai_buoi == "0")
+        {
+            <div class="row mt-2">
+                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                </div>
+                <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1>@ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd</h1>
+
+                            <span class="mt-3">
+                                Biểu mẫu điểm danh @ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd chưa mở.
+                            </span><br />
+                            <span>
+                                Hãy thử liên hệ với chủ sở hữu của biểu mẫu nếu bạn cho rằng đây là một sự nhầm lẫn.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                </div>
+            </div>
+        }
+        else if (ViewBag.trang_thai_buoi == "3")
+        {
+            <div class="row mt-2">
+                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                </div>
+                <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1>@ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd</h1>
+
+                            <span class="mt-3">
+                                Biểu mẫu điểm danh @ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd. Đã đóng form điểm danh.
+                            </span><br />
+                            <span>
+                                Hãy thử liên hệ với chủ sở hữu của biểu mẫu nếu bạn cho rằng đây là một sự nhầm lẫn.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row mt-2">
+                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                </div>
+                <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1>@ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd</h1>
+
+                            <span class="mt-3">
+                                Biểu mẫu điểm danh @ViewBag.ma_hd - @ViewBag.tieu_de - Ngày @ViewBag.ngay_bd_hd. <br />
+                                Hiện tại hoạt động đã hủy.
+                            </span><br />
+                            <span>
+                                Hãy thử liên hệ với chủ sở hữu của biểu mẫu nếu bạn cho rằng đây là một sự nhầm lẫn.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                </div>
+            </div>
+        }
+    }
+}
+<script type="text/javascript">
+    function save(idsv, idbuoi) {
+        $('#dialog-err').text('');
+        var email = $("#email").val();
+        if ($("#email").val() == "" || $("#sdt").val() == "") {
+            email = $("#emailsv").text();
+        }
+        var sdt = $("#sdt").val();
+        if ($("#sdt").val() == "" || $("#sdt").val() == "") {
+            sdt = $("#sdtsv").text();
+        }
+        if ($("#email").val() != "") {
+            if (checkEmail(email) == false) {
+                $('#dialog-err').text("Email sai định dạng");
+                return;
+            }
+        }
+        if ($("#sdt").val() != "") {
+            if (is_phonenumber($("#sdt").val()) == false) {
+                $('#dialog-err').text("Sai số điện thoại");
+                return;
+            }
+        }
+        var dataList = {idbuoi: idbuoi}
+        $.ajax({
+            url: '/SinhVien/KiemTraTrangThaiForm',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.data.Trang_Thai == 2) {
+                    var dataList2 = [];
+                    var dateTao = new Date();
+                    var data = {
+                        id_buoi: idbuoi,
+                        idsv: idsv.toString(),
+                        MASV: $("#masv").text(),
+                        email: email,
+                        loi_nhan: $("#loi_nhan").val(),
+                        SDT: sdt,
+                        NGAYDANGKY: dateTao.getFullYear() + '/' + (dateTao.getMonth() + 1) + '/' + dateTao.getDate(),
+                    }
+                    dataList2.push(data);
+
+                    $.ajax({
+                        url: '/SinhVien/saveDiemDanh',
+                        data: { cartModel: JSON.stringify(dataList2) },
+                        dataType: 'json',
+                        type: 'POST',
+                        success: function (res) {
+                            location.reload();
+                        }
+                    })
+                } else if (res.data.Trang_Thai == 4 || res.data.Trang_Thai == 0) {
+                    if (res.data != null) {
+                        $("#email").val($("#email").val());
+                        $("#sdt").val($("#sdt").val());
+                        $("#loi_nhan").val($("#loi_nhan").val());
+                        var dialog = bootbox.dialog({
+                            title: "Thông báo",
+                            message: 'Form hoạt động chưa mở',
+                            buttons: {
+                                cancel: {
+                                    label: "Bỏ qua",
+                                    className: 'btn-default input-sm',
+                                    callback: function () {
+                                        location.reload();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    if (res.data != null) {
+                        $("#email").val($("#email").val());
+                        $("#sdt").val($("#sdt").val());
+                        $("#loi_nhan").val($("#loi_nhan").val());
+                        var dialog = bootbox.dialog({
+                            title: "Thông báo",
+                            message: 'Form hoạt động đã hủy',
+                            buttons: {
+                                cancel: {
+                                    label: "Bỏ qua",
+                                    className: 'btn-default input-sm',
+                                    callback: function () {
+                                        location.reload();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        })
+    }
+</script>

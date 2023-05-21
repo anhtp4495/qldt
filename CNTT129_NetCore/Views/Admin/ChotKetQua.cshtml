@@ -1,0 +1,396 @@
+﻿@{
+    ViewBag.Title = "ChotKetQua";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using CNTT129.Models;
+@{
+    DANGKY dang_ky = new DANGKY();
+    DIEMDANH diem_danh = new DIEMDANH();
+    PHAN_HOI phan_hoi = new PHAN_HOI();
+    VI_PHAM vi_pham = new VI_PHAM();
+    HOATDONG hoat_dong = new HOATDONG();
+    HOATDONGNGOAI hoat_dong_ngoai = new HOATDONGNGOAI();
+}
+<body class="preloading">
+    <!-- Hiệu ứng load -->
+    <!-- <div class="load">
+       <img src="loader.gif">
+    </div> -->
+    <div class="loader">
+        <span class="fas fa-spinner xoay icon"></span>
+    </div>
+    <div class="content">
+        <div class="border-bottom-0">
+            <ul class="nav nav-tabs" id="">
+                <li class="nav-item">
+                    <a id="tab-1" class="nav-link active" href="/Admin/ChotKetQua">Chốt điểm rèn luyện</a>
+                </li>
+            </ul>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-1">
+                Từ ngày
+            </div>
+            <div class="col-md-2">
+                <input class="form-control" id="start_date" name="start_date" placeholder="" value="@ViewBag.start_date" />
+            </div>
+            <div class="col-md-1">
+                Đến ngày
+            </div>
+            <div class="col-md-2">
+                <input class="form-control" id="end_date" name="end_date" placeholder="" value="@ViewBag.end_date" />
+            </div>
+            <div class="col-md-2">
+
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-info" onclick="saveFn2()">Chốt kết theo đợt</button>
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-info" onclick="saveFn()">Chốt kết quả nguyên kỳ</button>
+            </div>
+            <div class="col-12" style="overflow-y: auto;height:600px">
+                <h2>DANH SÁCH HOẠT ĐỘNG</h2>
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <td rowspan="2">STT</td>
+                            <td rowspan="2">Mã HĐ</td>
+                            <td rowspan="2">Tên HĐ</td>
+                            <td colspan="4" class="text-center">Tình hình hoạt động</td>
+                            <td colspan="5" class="text-center">Tình hình phản hồi</td>
+                        </tr>
+                        <tr>
+                            <td>SV ĐK</td>
+                            <td>SV Hủy</td>
+                            <td>SV TG</td>
+                            <td>SV Không TG</td>
+                            <td>SV Gửi PH</td>
+                            <td>PH Duyệt</td>
+                            <td>PH Chưa Duyệt</td>
+                            <td>PH Hủy</td>
+                            <td>PH Từ chối</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var i = 1;
+                            foreach (var item in ViewData["data_hoat_dong"] as List<HOATDONG>)
+                            {
+                                DateTime ngay_dd = DateTime.Parse(item.NGAY_BAT_DAU);
+                                var datedd = ngay_dd.ToString("dd/MM/yyyy");
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.MAHD</td>
+                                    <td>
+                                        @item.TIEUDE (@{
+                                if (item.LOAI_BUOI == "1")
+                                {
+                                    <span>Sáng @datedd</span>
+                                }
+                                if (item.LOAI_BUOI == "2")
+                                {
+                                    <span>Chiều @datedd</span>
+                                }
+                                if (item.LOAI_BUOI == "3")
+                                {
+                                    <span>Tối @datedd</span>
+                                }
+                                if (item.LOAI_BUOI == "0")
+                                {
+                                    <span>Cả ngày @datedd</span>
+                                }
+                                        }
+                                        )
+                                    </td>
+                                    <td class="text-center">
+                                        @dang_ky.demSLSV(item.IDBUOI, "")
+                                    </td>
+                                    <td class="text-center">
+                                        @dang_ky.demSLSV(item.IDBUOI, "4")
+                                    </td>
+                                    <td class="text-center">
+                                        @diem_danh.demSLSV(item.IDBUOI, "")
+                                    </td>
+                                    <td class="text-center">
+                                        @dang_ky.demSLSV(item.IDBUOI, "3")
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV(item.IDBUOI, "")
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV(item.IDBUOI, "1")
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV(item.IDBUOI, "0")
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV(item.IDBUOI, "3")
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV(item.IDBUOI, "2")
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-12" style="overflow-y: auto;height:600px">
+                <h2>DANH SÁCH VI PHẠM</h2>
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <td rowspan="2">STT</td>
+                            <td rowspan="2">Mã NQ</td>
+                            <td rowspan="2">Tên NQ</td>
+                            <td colspan="3" class="text-center">Tình hình vi phạm</td>
+                            <td colspan="5" class="text-center">Tình hình phản hồi</td>
+                        </tr>
+                        <tr>
+                            <td>VP Chưa Duyệt</td>
+                            <td>VP Duyệt</td>
+                            <td>VP Hủy</td>
+                            <td>SV Gửi PH</td>
+                            <td>PH Duyệt</td>
+                            <td>PH Chưa Duyệt</td>
+                            <td>PH Hủy</td>
+                            <td>PH Từ chối</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var j = 1;
+                            foreach (var item in ViewData["data_noi_quy"] as List<NOI_QUY>)
+                            {
+                                <tr>
+                                    <td>@j</td>
+                                    <td>@item.CODE_NOI_QUY</td>
+                                    <td>
+                                        @item.TEN_NOI_QUY
+                                    </td>
+                                    <td class="text-center">
+                                        @vi_pham.demSLSV(item.ID_NOI_QUY, "0", ViewBag.idhk)
+                                    </td>
+                                    <td class="text-center">
+                                        @vi_pham.demSLSV(item.ID_NOI_QUY, "1", ViewBag.idhk)
+                                    </td>
+                                    <td class="text-center">
+                                        @vi_pham.demSLSV(item.ID_NOI_QUY, "2", ViewBag.idhk)
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV2(item.ID_NOI_QUY, "", ViewBag.idhk)
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV2(item.ID_NOI_QUY, "1", ViewBag.idhk)
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV2(item.ID_NOI_QUY, "0", ViewBag.idhk)
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV2(item.ID_NOI_QUY, "3", ViewBag.idhk)
+                                    </td>
+                                    <td class="text-center">
+                                        @phan_hoi.demSLSV2(item.ID_NOI_QUY, "2", ViewBag.idhk)
+                                    </td>
+                                </tr>
+                                j++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(window).on('load', function(event) {
+            $('body').removeClass('preloading');
+            //$('.load').delay(1000).fadeOut('fast');
+            $('.loader').delay(1000).fadeOut('fast');
+        });
+    })
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#start_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true}).datepicker('update', new Date());
+        $('#end_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true}).datepicker('update', new Date());
+    })
+    function saveFn2() {
+        var start_date = $('#start_date').val().split("/");
+        var end_date = $('#end_date').val().split("/");
+        var datebd = new Date(start_date[2] + '/' + start_date[1] + '/' + start_date[0]);
+        var datekt = new Date(end_date[2] + '/' + end_date[1] + '/' + end_date[0]);
+
+        if (datebd > datekt) {
+            var dialog = bootbox.dialog({
+                title: "Cảnh báo !!",
+                message: "Ngày bắt đầu phải nhỏ hơn ngày kết thúc !!",
+                buttons: {
+                    cancel: {
+                        label: "Bỏ qua",
+                        className: 'btn-default input-sm',
+                        callback: function () {
+                            console.log('Bỏ qua');
+                        }
+                    }
+                }
+            });
+            return;
+        }
+
+        var data = [{
+            start_date: start_date[2] + '/' + start_date[1] + '/' + start_date[0],
+            end_date: end_date[2] + '/' + end_date[1] + '/' + end_date[0]
+        }];
+        var title = "Xác nhận chốt điểm rèn luyện từ ngày "+ $("#start_date").val() + " đến ngày "+  $('#end_date').val();
+        var message = "";
+        message += "Bạn muốn xác nhận chốt điểm rèn luyện từ ngày "+ $("#start_date").val() + " đến ngày "+  $('#end_date').val() +"? <br/>";
+        $.ajax({
+            url: '/Admin/ktraSlSvChuaXl',
+            data: { cartModel: JSON.stringify(data) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res.demSlVP != 0 || res.res.demSlPH != 0 || res.res.demSlHD != 0) {
+                    if (res.res.demSlVP != 0) {
+                        message += " Hiện tại vẫn còn " + res.res.demSlVP +" vi phạm chưa xử lý !!! <br/>"
+                    }
+                    if (res.res.demSlPH != 0) {
+                        message += " Hiện tại vẫn còn " + res.res.demSlPH +" phản hồi chưa xử lý !!! <br/>"
+                    }
+                    if (res.res.demSlHD != 0) {
+                        message += " Hiện tại vẫn còn " + res.res.demSlHD +" hoạt động chưa xử lý !!! <br/>"
+                    }
+                    if (res.res.demslHDN != 0) {
+                        message += " Hiện tại vẫn còn " + res.res.demslHDN +" hoạt động ngoài trường chưa xử lý !!! <br/>"
+                    }
+                    message += "Hiện tại vẫn còn hoạt động chưa xử lý xong không thể chốt!!!";
+                    var dialog = bootbox.dialog({
+                        title: title,
+                        message: message,
+                        buttons: {
+                            cancel: {
+                                label: "Bỏ qua",
+                                className: 'btn-default input-sm',
+                                callback: function () {
+                                    console.log('Bỏ qua');
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    var dialog = bootbox.dialog({
+                        title: title,
+                        message: message,
+                        buttons: {
+                            ok: {
+                                label: "Đồng ý",
+                                className: 'btn-primary input-sm',
+                                callback: function () {
+                                    $.ajax({
+                                        url: '/Admin/updateDiemDot',
+                                        data: { cartModel: JSON.stringify(data) },
+                                        dataType: 'json',
+                                        type: 'POST',
+                                        success: function (res) {
+                                            location.reload();
+                                        }
+                                    })
+                                }
+                            },
+                            cancel: {
+                                label: "Bỏ qua",
+                                className: 'btn-default input-sm',
+                                callback: function () {
+                                    console.log('Bỏ qua');
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        })
+    }
+    function saveFn() {
+        var dataList = [];
+        var title = "Xác nhận chốt điểm rèn luyện học kỳ @ViewBag.tenhk";
+        var message = "";
+        message += "Bạn muốn xác nhận chốt điểm rèn luyện học kỳ @ViewBag.tenhk ?? <br/>";
+        var demSlVP =@vi_pham.demSL(ViewBag.idhk,"","");
+        var demSlPH =@phan_hoi.demSL(ViewBag.idhk,"","");
+        var demSlHD =@hoat_dong.demSL(ViewBag.idhk,"","");
+        var demslHDN = @hoat_dong_ngoai.demSL(ViewBag.idhk,"","");
+        if (demSlVP != 0 || demSlPH != 0 || demSlHD != 0) {
+            if (demSlVP != 0) {
+                message += " Hiện tại vẫn còn " + demSlVP +" vi phạm chưa xử lý !!! <br/>"
+            }
+
+            if (demSlPH != 0) {
+                message += " Hiện tại vẫn còn " + demSlPH +" phản hồi chưa xử lý !!! <br/>"
+            }
+
+            if (demSlHD != 0) {
+                message += " Hiện tại vẫn còn " + demSlHD +" hoạt động chưa xử lý !!! <br/>"
+            }
+
+            if (demslHDN != 0) {
+                message += " Hiện tại vẫn còn " + demslHDN +" hoạt động ngoài trường chưa xử lý !!! <br/>"
+            }
+            message += "Hiện tại vẫn còn hoạt động chưa xử lý xong không thể chốt!!!";
+            var dialog = bootbox.dialog({
+                title: title,
+                message: message,
+                buttons: {
+                    cancel: {
+                        label: "Bỏ qua",
+                        className: 'btn-default input-sm',
+                        callback: function () {
+                            console.log('Bỏ qua');
+                        }
+                    }
+                }
+            });
+        } else {
+            message += '<lable>Nhập điểm rèn luyện</lable> <input type="number" class="form-control" id="diemmd"/>';
+            var dialog = bootbox.dialog({
+                title: title,
+                message: message,
+                buttons: {
+                    ok: {
+                        label: "Đồng ý",
+                        className: 'btn-primary input-sm',
+                        callback: function () {
+                            if ($("#diemmd").val() <= 0 || $("#diemmd").val() > 100) {
+                                alert("Nhập điểm lớn hơn 0!!");
+                                return;
+                            } else {
+                                dataList.push({diemmd: $("#diemmd").val() });
+                                $.ajax({
+                                    url: '/Admin/updateDiemAll',
+                                    data: { cartModel: JSON.stringify(dataList) },
+                                    dataType: 'json',
+                                    type: 'POST',
+                                    success: function (res) {
+                                        location.reload();
+                                    }
+                                })
+                            }
+
+                        }
+                    },
+                    cancel: {
+                        label: "Bỏ qua",
+                        className: 'btn-default input-sm',
+                        callback: function () {
+                            console.log('Bỏ qua');
+                        }
+                    }
+                }
+            });
+        }
+    }
+</script>

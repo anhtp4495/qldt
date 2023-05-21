@@ -1,0 +1,593 @@
+﻿@{
+    ViewBag.Title = "SINHVIEN";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    string gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+    KHOA khoa = new KHOA();
+    var menu_khoa = khoa.find("", "", "0");
+
+    LOP lop = new LOP();
+    var menu_lop = lop.find();
+
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+
+    var trang_thai_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected == "" },
+        new SelectListItem() { Value = "0", Text = "Chưa khóa", Selected = ViewBag.selected == "0" },
+        new SelectListItem() { Value = "1", Text = "Đã khóa", Selected = ViewBag.selected == "1" }
+    };
+
+    var khoa_list = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value = "", Text = "Tất cả", Selected = ViewBag.selected_khoa == "" },
+    };
+    foreach (var item in menu_khoa)
+    {
+        khoa_list.Add(new SelectListItem() { Value = item.ID_KHOA, Text = item.TEN_KHOA, Selected = ViewBag.selected_khoa == item.ID_KHOA });
+    }
+}
+<div class="border-bottom-0">
+    <ul class="nav nav-tabs" id="">
+        <li class="nav-item">
+            <a id="tab-1" class="nav-link active" href="/Admin/GIANGVIEN">Danh mục sinh viên</a>
+        </li>
+    </ul>
+</div>
+@using (Html.BeginForm("SinhVien", "Admin", FormMethod.Post, new { @class = "" }))
+{
+    <div class="row mt-3">
+        <div class="col-md-1">
+            Mã SV
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="ma_gv" id="ma_gv" value="@ViewBag.SINHVIEN" />
+        </div>
+        <div class="col-md-1">
+            Tên vai trò
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="ten_gv" id="ten_gv" value="@ViewBag.ten_gv" />
+        </div>
+        <div class="col-md-1">
+            Trạng thái
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="trang_thai" name="trang_thai" asp-items="@trang_thai_list">
+            </select>
+        </div>
+        <div class="col-md-1">
+            Khoa
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="khoa" name="khoa" asp-items="@khoa_list">
+            </select>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-11">
+        </div>
+        <div class="col-md-1 text-right">
+            <input class="btn btn-primary form-control" name="find" value="Tìm" type="submit" />
+        </div>
+    </div>
+}
+<div class="row mt-2">
+    <div class="col-md-4 text-right">
+    </div>
+    <div class="col-md-4 text-right">
+    </div>
+    <div class="col-md-4 text-right">
+        @{
+            if (quyen.getDataQuyenGV(gvID, "them_moi_sinh_vien") == 1 || gvID.Equals("1"))
+            {
+                <button class="btn btn-primary" id="them" onclick="showFromSinhVien(0)">Thêm mới</button>
+            }
+        }
+
+    </div>
+</div>
+
+<div id="khung" class=" mt-2">
+    <div id="list">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>STT</td>
+                    <td>Mã</td>
+                    <td>Tên</td>
+                    <td>Trạng thái</td>
+                    <td>Thao tác</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var data = ViewData["data"];
+                    if (ViewData["data"] != null)
+                    {
+                        int i = 1;
+                        foreach (var std in ViewData["data"] as IList<CNTT129.Models.SINHVIEN>)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@std.MASV</td>
+                                <td>@std.TENSV</td>
+                                <td>
+                                    @{
+                            if (std.disabled == 0)
+                            {
+                                <span>Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span>Đã khóa</span>
+                            }
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                            if (quyen.getDataQuyenGV(gvID, "sua_sinh_vien") == 1 || gvID.Equals("1"))
+                            {
+                                <button type="button" class="btn btn-primary" onclick="showFromSinhVien(@std.ID_SV)">Sửa</button>
+                            }
+                                    }
+                                    @{
+                            if (quyen.getDataQuyenGV(gvID, "khoa_mo_sinh_vien") == 1 || gvID.Equals("1"))
+                            {
+                                if (std.disabled == 0)
+                                {
+                                    <button type="button" class="btn btn-danger" onclick="showFromDisbledSV(@std.ID_SV,'@std.TENSV.ToString()',1)">Khóa</button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-success" onclick="showFromDisbledSV(@std.ID_SV,'@std.TENSV.ToString()',0)">Mở khóa</button>
+                                }
+                            }
+                                    }
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="editDivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id='editDiv' class="">
+                    <input id="id_sv" class="form-control d-none" />
+                    <div class="row">
+                        <div class="col-2">
+                            Mã
+                        </div>
+                        <div class="col-4">
+                            <input id="code_sv" class="form-control" placeholder="Mã sinh viên tự động tạo" />
+                        </div>
+                        <div class="col-2">
+                            Tên
+                        </div>
+                        <div class="col-4">
+                            <input id="name_sv" class="form-control" placeholder="Nhập tên" />
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Địa chỉ
+                        </div>
+                        <div class="col-4">
+                            <input id="dia_chi" class="form-control" placeholder="Nhập Địa chỉ" />
+                        </div>
+                        <div class="col-2">
+                            Số điện thoại
+                        </div>
+                        <div class="col-4">
+                            <input id="so_dt" class="form-control" placeholder="Nhập Số điện thoại" />
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Email
+                        </div>
+                        <div class="col-4">
+                            <input id="email" class="form-control" placeholder="Nhập Email" />
+                        </div>
+                        <div class="col-2">
+                            Ngày sinh
+                        </div>
+                        <div class="col-4 date">
+                            <div class="form-group">
+                                <div class='input-group date' id='datepicker'>
+                                    <input id="ngay_sinh" type='text' class="form-control" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            @*<input  class="form-control datepicker" placeholder=""/>*@
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Khoa
+                        </div>
+                        <div class="col-4">
+                            <select class="form-control" id="khoa_edit" name="khoa_edit">
+                                @{
+                                    foreach (var item in menu_khoa)
+                                    {
+                                        <option value="@item.ID_KHOA">@item.TEN_KHOA</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            Lớp
+                        </div>
+                        <div class="col-4">
+                            <select class="form-control" id="lop_edit" name="lop_edit">
+                                @{
+                                    foreach (var item in menu_lop)
+                                    {
+                                        <option value="@item.ID_LOP">@item.CODE_LOP</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Bậc đào tạo
+                        </div>
+                        <div class="col-4">
+                            <select class="form-control" id="bdt_edit" name="bdt_edit">
+                                <option value="0">Đại Học</option>
+                                <option value="1">Thạc Sĩ</option>
+                                <option value="2">Tiến Sĩ</option>
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            Nơi sinh
+                        </div>
+                        <div class="col-4">
+                            <select class="form-control" name="calc_shipping_provinces">
+                                <option value="">Tỉnh, thành phố</option>
+                            </select>
+                            <input class="form-control billing_address_1" type="hidden" placeholder="Chọn tỉnh, thành" id="tinh_thanh">
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Giới tính
+                        </div>
+                        <div class="col-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="0" checked>
+                                <label class="form-check-label" for="inlineRadio1">Nam</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="1">
+                                <label class="form-check-label" for="inlineRadio2">Nữ</label>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            Hình ảnh
+                        </div>
+                        <div class="col-4">
+                            <div class="input-group mb-3">
+                                <div class="custom-file">
+                                    <input id="value_img" class="form-control d-none" value="" />
+                                    <input type="file" class="custom-file-input hinh5" id="inputGroupFile" name="" data-id="" value="">
+                                    <label class="custom-file-label" for="inputGroupFile">Choose file</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-2">
+                            Mật khẩu
+                        </div>
+                        <div class="col-4">
+                            <input id="mat_khau" type="password" class="form-control" placeholder="" />
+                        </div>
+                        <div class="col-2">
+                            Nhập lại mật khẩu
+                        </div>
+                        <div class="col-4">
+                            <input id="mat_khau2" type="password" class="form-control" placeholder="" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id='dialog-err' class='error-msg'></span>
+                <button class="btn" onclick="save()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ngay_sinh').datepicker(
+            {
+                format: 'dd/mm/yyyy',
+                todayHighlight: true,
+            }
+        );
+    })
+    function showFromSinhVien(id) {
+        $('#dialog-err').text("");
+        var dataList = [];
+        var data = {
+            id: id,
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/findSV',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                var _title = "Sửa sinh viên";
+                $('#code_sv').val("");
+                $('#name_sv').val("");
+                $('#dia_chi').val("");
+                $('#so_dt').val("");
+                $('#email').val("");
+                $('#ngay_sinh').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker('update', new Date());
+                $('#mat_khau').val("");
+                $('#mat_khau2').val("");
+                $('#id_sv').val(id);
+                document.getElementById("code_sv").disabled = true;
+                if (id == "0") {
+                    _title = "Thêm mới";
+                }
+                if (res.res.length > 0) {
+                    $('#code_sv').val(res.res[0].MASV);
+                    $('#name_sv').val(res.res[0].TENSV);
+                    $('#dia_chi').val(res.res[0].dc);
+                    $('#so_dt').val(res.res[0].SDT);
+                    $('#email').val(res.res[0].email);
+                    $('#value_img').val(res.res[0].HINHANH);
+                    $('#datepicker').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker('update', new Date(res.res[0].NGAYSINH));
+                    $("#lop_edit").val(res.res[0].idkhoa).change();
+                    $("#khoa_edit").val(res.res[0].idkhoa).change();
+                    $("#bdt_edit").val(res.res[0].BAC_DAO_TAO).change();
+                    if (res.res[0].GIOITINH == 0) {
+                        document.getElementById("inlineRadio1").checked = true;
+                    } else {
+                        document.getElementById("inlineRadio2").checked = true;
+                    }
+                }
+                $('#editDivModal').modal('show');
+                $('#editDivModal #myModalLabel').html(_title);
+            }
+        })
+    }
+    function save() {
+        var dataList = [];
+        if ($('#name_sv').val().trim() == "" || $('#dia_chi').val().trim() == "" || $('#so_dt').val().trim() == "" || $('#email').val().trim() == "" || $('#mat_khau').val().trim() == "" || $('#mat_khau2').val().trim() == "" || $('#ngay_sinh').val().trim() == "" || $("#tinh_thanh").val() == "") {
+            $('#dialog-err').text("Vui lòng điền đủ thông tin");
+            return;
+        }
+        if ($('#mat_khau').val().trim() != $('#mat_khau2').val().trim()) {
+            $('#dialog-err').text("Vui lòng nhập mật khẩu giống nhau");
+            return;
+        }
+        if ($('#so_dt').val().trim().length < 10 || $('#so_dt').val().trim().length > 10) {
+            $('#dialog-err').text("Số điện thoại phải đủ 10 ký tự");
+            return;
+        }
+        var date = new Date();
+        var date_bith = $('#ngay_sinh').val().split("/");
+        if (date.getFullYear() - date_bith[2] < 18) {
+            $('#dialog-err').text("Ngày sinh phải lớn hơn 18 tuổi");
+            return;
+        }
+        if ($('#mat_khau').val().trim().length < 5) {
+            $('#dialog-err').text("Mật khẩu phải đủ 5 ký tự");
+            return;
+        }
+        if (checkEmail() == false) {
+            $('#dialog-err').text("Email sai định dạng");
+            return;
+        }
+
+        var formData = new FormData();
+        if (formData != undefined) {
+            var dataImg = [];
+            var list = $('.hinh5');
+            $.each(list, function (i, item) {
+                var fileUpload = $("#inputGroupFile")[0].files[0];
+                if (fileUpload == undefined) {
+                    if ($("#value_img").val() != "") {
+                        dataImg.push($("#value_img").val());
+                    } else {
+                        $('#dialog-err').text('Vui lòng chọn ảnh');
+                        return;
+                    }
+                } else {
+                    dataImg.push(fileUpload.name);
+                    formData.append('file', fileUpload);
+                }
+            });
+        }
+        if (dataImg.length == 0) {
+            $('#dialog-err').text('Vui lòng chọn ảnh');
+            return;
+        }
+        var data = {
+            ID: $('#id_sv').val(),
+            MA: $('#code_sv').val(),
+            TEN: $('#name_sv').val(),
+            DC: $('#dia_chi').val(),
+            SDT: $('#so_dt').val(),
+            email: $('#email').val(),
+            mat_khau: $('#mat_khau').val(),
+            idkhoa: $('#khoa_edit option:selected').val(),
+            ngay_sinh: date_bith[2] + '/' + date_bith[1] + '/' + date_bith[0],
+            lop: $('#lop_edit').val(),
+            bac_dao_tao: $('#bdt_edit').val(),
+            hinh_anh: dataImg.join(","),
+            tinh_thanh: $('#tinh_thanh').val(),
+            gioi_tinh: document.getElementById("inlineRadio1").checked == true ? $('#inlineRadio1').val() : $('#inlineRadio2').val(),
+        };
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/saveSV',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                } else if (res.res == 2) {
+                    $('#dialog-err').text("Mã giảng viên đã tồn tại");
+                }
+                else {
+                    $.ajax({
+                        url: "/Admin/UploadFiles",
+                        method: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                        },
+                        error: function (data) {
+                        }
+                    })
+                    location.reload();
+                    $('#editDivModal').modal('hide');
+                }
+            }
+        })
+    }
+
+    function showFromDisbledSV(id, name, disabled) {
+        var dataList = [];
+        var data = {
+            ID: id,
+            disabled: disabled.toString()
+        };
+        var title = "";
+        if (disabled == 1) {
+            title = "Khóa";
+        } else {
+            title = "Mở khóa";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' User Sinh viên',
+            message: 'Bạn có muốn ' + title + ' User Sinh viên "' + name + '"?',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updateSV',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+</script>
+<script src='https://cdn.jsdelivr.net/gh/vietblogdao/js/districts.min.js'></script>
+<script>
+    //<![CDATA[
+    if (address_2 = localStorage.getItem('address_2_saved')) {
+        $('select[name="calc_shipping_district"] option').each(function () {
+            if ($(this).text() == address_2) {
+                $(this).attr('selected', '')
+            }
+        })
+        $('input.billing_address_2').attr('value', address_2)
+    }
+    if (district = localStorage.getItem('district')) {
+        $('select[name="calc_shipping_district"]').html(district)
+        $('select[name="calc_shipping_district"]').on('change', function () {
+            var target = $(this).children('option:selected')
+            target.attr('selected', '')
+            $('select[name="calc_shipping_district"] option').not(target).removeAttr('selected')
+            address_2 = target.text()
+            $('input.billing_address_2').attr('value', address_2)
+            district = $('select[name="calc_shipping_district"]').html()
+            localStorage.setItem('district', district)
+            localStorage.setItem('address_2_saved', address_2)
+        })
+    }
+    $('select[name="calc_shipping_provinces"]').each(function () {
+        var $this = $(this),
+            stc = ''
+        c.forEach(function (i, e) {
+            e += +1
+            stc += '<option value=' + e + '>' + i + '</option>'
+            $this.html('<option value="">Tỉnh, thành</option>' + stc)
+            if (address_1 = localStorage.getItem('address_1_saved')) {
+                $('select[name="calc_shipping_provinces"] option').each(function () {
+                    if ($(this).text() == address_1) {
+                        $(this).attr('selected', '')
+                    }
+                })
+                $('input.billing_address_1').attr('value', address_1)
+            }
+            $this.on('change', function (i) {
+                i = $this.children('option:selected').index() - 1
+                var str = '',
+                    r = $this.val()
+                if (r != '') {
+                    arr[i].forEach(function (el) {
+                        str += '<option value="' + el + '">' + el + '</option>'
+                        $('select[name="calc_shipping_district"]').html('<option value="">Quận, huyện</option>' + str)
+                    })
+                    var address_1 = $this.children('option:selected').text()
+                    var district = $('select[name="calc_shipping_district"]').html()
+                    localStorage.setItem('address_1_saved', address_1)
+                    localStorage.setItem('district', district)
+                    $('select[name="calc_shipping_district"]').on('change', function () {
+                        var target = $(this).children('option:selected')
+                        target.attr('selected', '')
+                        $('select[name="calc_shipping_district"] option').not(target).removeAttr('selected')
+                        var address_2 = target.text()
+                        $('input.billing_address_2').attr('value', address_2)
+                        district = $('select[name="calc_shipping_district"]').html()
+                        localStorage.setItem('district', district)
+                        localStorage.setItem('address_2_saved', address_2)
+                    })
+                } else {
+                    $('select[name="calc_shipping_district"]').html('<option value="">Quận, huyện</option>')
+                    district = $('select[name="calc_shipping_district"]').html()
+                    localStorage.setItem('district', district)
+                    localStorage.removeItem('address_1_saved', address_1)
+                }
+            })
+        })
+    })
+</script>

@@ -1,0 +1,322 @@
+﻿@{
+    ViewBag.Title = "Danh sách hoạt động";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using CNTT129.Models;
+@using CNTT129_NetCore.Extensions;
+@{
+    KHOA khoa = new KHOA();
+    var menu_khoa = khoa.find("", "", "0");
+    HOCKY hocky = new HOCKY();
+    var menu_hocky = hocky.find2();
+
+    LOAIQUYENOFGV quyen = new LOAIQUYENOFGV();
+    string? gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="border-bottom-0">
+            <ul class="nav nav-tabs" id="">
+                <li class="nav-item">
+                    <a id="tab-1" class="nav-link" href="/Admin/ThemHoatDong">Thêm hoạt động</a>
+                </li>
+                <li class="nav-item">
+                    <a id="tab-2" class="nav-link active" href="/Admin/DanhSachHoatDong">Danh sách hoạt động</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("DanhSachHoatDong", "Admin", FormMethod.Post, new { @class = "" }))
+{
+    <div class="row mt-3">
+        <div class="col-md-1">
+            Mã Hoạt Động
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="ma_gv" id="ma_hd" value="@ViewBag.ma_hd" />
+        </div>
+        <div class="col-md-1">
+            Tên Hoạt Động
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="ten_gv" id="ten_hd" value="@ViewBag.ten_hd" />
+        </div>
+        <div class="col-md-1">
+            Từ ngày
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" id="start_date" name="start_date" placeholder="" value="@ViewBag.start_date" />
+        </div>
+        <div class="col-md-1">
+            Đến ngày
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" id="end_date" name="end_date" placeholder="" value="@ViewBag.end_date" />
+        </div>
+        <div class="col-md-1">
+            Loại
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="loai" name="loai">
+                @{
+                    var selected_loai0 = ViewBag.selected_loai == "" ? "selected" : "";
+                    var selected_loai1 = ViewBag.selected_loai == "1" ? "selected" : "";
+                    var selected_loai2 = ViewBag.selected_loai == "2" ? "selected" : "";
+                    <option value="" selected="@selected_loai0">Tất cả</option>
+                    <option value="1" selected="@selected_loai1">Buổi</option>
+                    <option value="2" selected="@selected_loai2">Cả ngày</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-1">
+            Trạng thái
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="trang_thai" name="trang_thai">
+                @{
+                    var selected_trang_thai = ViewBag.selected_loai == "" ? "selected" : "";
+                    var selected_trang_thai0 = ViewBag.selected_loai == "1" ? "selected" : "";
+                    var selected_trang_thai1 = ViewBag.selected_loai == "1" ? "selected" : "";
+                    var selected_trang_thai2 = ViewBag.selected_loai == "2" ? "selected" : "";
+                    var selected_trang_thai4 = ViewBag.selected_loai == "2" ? "selected" : "";
+                    <option value="" selected="@selected_trang_thai">Tất cả</option>
+                    <option value="0" selected="@selected_trang_thai0">Chưa Duyệt</option>
+                    <option value="1" selected="@selected_trang_thai1">Đã Duyệt</option>
+                    <option value="2" selected="@selected_trang_thai2">Đã hủy</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-1">
+            Đơn vị
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="khoa" name="khoa">
+                @*<option value="0" @{var selected_khoa = ""; if (ViewBag.selected_khoa == "") { selected_khoa = "selected = 'selected'"; }} @selected_khoa>Tất cả</option>
+                @{
+    foreach (var item in menu_khoa)
+    {
+        <option value="@item.ID_KHOA" @{selected_khoa = ""; if (ViewBag.selected_khoa == item.ID_KHOA) { selected_khoa = "selected = 'selected'"; }} @selected_khoa>@item.TEN_KHOA</option>
+    }
+                }*@
+            </select>
+        </div>
+        <div class="col-md-1">
+            Học kỳ
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="hocky" name="hocky">
+                @{
+    //                <option value="0" @{var selected_hk = ""; if (ViewBag.selected_hocky == "") { selected_hk = "selected = 'selected'"; }} @selected_hk>Tất cả</option>
+    //foreach (var item in menu_hocky)
+    //{
+    //    <option value="@item.IDHK" @{selected_hk = ""; if (ViewBag.selected_hocky == item.IDHK) { selected_hk = "selected = 'selected'"; }} @selected_hk>@item.TENHK</option>
+    //}
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-1 mt-1 text-right">
+            <input class="btn btn-primary" name="find" value="Tìm" type="submit" />
+        </div>
+    </div>
+}
+<div id="list">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>STT</td>
+                <td>Mã</td>
+                <td>Tiêu đề</td>
+                <td>Người tạo</td>
+                <td>Ngày tạo</td>
+                <td>Người sửa</td>
+                <td>Ngày sửa</td>
+                <td>Người duyệt</td>
+                <td>Ngày Duyệt</td>
+                <td>Đơn vị</td>
+                <td>Học kỳ</td>
+                <td>Loại</td>
+                <td>Trạng thái</td>
+                <td>Thao tác</td>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var data = ViewData["data"];
+                if (ViewData["data"] != null)
+                {
+                    int i = 1;
+                    foreach (var std in ViewData["data"] as IList<CNTT129.Models.HOATDONG>)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@std.MAHD</td>
+                            <td>@std.TIEUDE</td>
+                            <td>@std.name_ngtao</td>
+                            <td>
+                            @{
+                                DateTime NGAYTAO = DateTime.Parse(std.NGAYTAO);
+                                var ngaytao = NGAYTAO.ToString("dd/MM/yyyy");
+                            }@ngaytao</td>
+                            <td>@std.name_ngsua</td>
+                            <td>
+                            @{ try
+                               {
+                                   DateTime NGAYSUA = DateTime.Parse(std.NGAYSUA);
+                                   var ngaysua = NGAYSUA.ToString("dd/MM/yyyy");
+                                   @ngaysua
+                               }
+                               catch (Exception)
+                               {
+                                  
+                               }
+                                
+                            }</td>
+                            <td>@std.name_ngduyet</td>
+                            <td>@{try
+                            {
+                                DateTime NGAYDUYET = DateTime.Parse(std.NGAYDUYET);
+                                var ngayduyet = NGAYDUYET.ToString("dd/MM/yyyy");
+                                @ngayduyet
+                            }
+                            catch (Exception)
+                            {
+
+                            }
+                            }</td>
+                            <td>@std.name_khoa</td>
+                            <td>@std.name_hocky</td>
+                            <td>
+                                @{
+                        if (std.LOAI == 1)
+                        {
+                            <span>Buổi</span>
+                        }
+                        else
+                        {
+                            <span>Cả ngày</span>
+                        }
+                                }
+                            </td>
+                            <td>
+                                @{
+                        if (std.TRANGTHAI == 0)
+                        {
+                            <span>Chưa duyệt</span>
+                        }
+                        else if (std.TRANGTHAI == 1)
+                        {
+                            <span>Đã duyệt</span>
+                        }
+                        else
+                        {
+                            <span>Đã hủy</span>
+                        }
+                                }
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Thao tác
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        @{
+                                            if (quyen.getDataQuyenGV(gvID, "sua_hoat_dong") == 1 || gvID.Equals("1"))
+                        {
+                            if (std.TRANGTHAI == 0)
+                            {
+                                <a class="dropdown-item" href="/Admin/SuaHoatDong/@std.IDHD">Sửa</a>
+                            }
+                        }
+                                        }
+                                        <a class="dropdown-item" href="/Admin/ChiTietHoatDong/@std.IDHD">Chi tiết hoat động</a>
+                                        @{
+                                            if (quyen.getDataQuyenGV(gvID, "duyet_hoat_dong") == 1 || gvID.Equals("1"))
+                        {
+                            DateTime ngay_ht = DateTime.Today;
+                            if (std.TRANGTHAI == 0 && DateTime.Parse(std.NGAYBATDAUDK) >= ngay_ht)
+                            {
+                                <a class="dropdown-item" onclick="showFromHD(@std.IDHD,'@std.TIEUDE.ToString()',1)">Duyệt hoạt động</a>
+                            }
+                            if (std.TRANGTHAI == 0)
+                            {
+                                <a class="dropdown-item" onclick="showFromHD(@std.IDHD,'@std.TIEUDE.ToString()',2)">Hủy hoạt động</a>
+                            }
+
+                        }
+
+}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                }
+            }
+        </tbody>
+    </table>
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#start_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker();
+        $('#end_date').datepicker({ format: 'dd/mm/yyyy', todayHighlight: true, }).datepicker();
+    });
+</script>
+<script type="text/javascript">
+
+    function showFromHD(id, name, trangthai) {
+        var dataList = [];
+        var date = new Date();
+        var data = {
+            ID: id,
+            trangthai: trangthai.toString(),
+            ngay: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
+        };
+        var title = "";
+        if (trangthai == 1) {
+            title = "Duyệt";
+        } else {
+            title = "Hủy";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' Hoạt động',
+            message: 'Bạn có muốn ' + title + ' hoạt động "' + name + '"?',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updateTT',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+</script>

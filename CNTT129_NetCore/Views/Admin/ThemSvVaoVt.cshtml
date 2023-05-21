@@ -1,0 +1,129 @@
+﻿@{
+    ViewBag.Title = "ThemSvVaoVt";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+@using CNTT129.Models;
+@{
+    SINHVIEN sv = new SINHVIEN();
+}
+<div class="row">
+    <div class="col-2">
+        Sinh Viên
+    </div>
+    <div class="col-8">
+        <select id="sinh_vien" class="form-control select2" multiple>
+            @{
+                foreach (var item in sv.findSvVT(ViewBag.id_vt))
+                {
+                    <option value="@item.ID_SV">@item.MASV - @item.TENSV</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-1">
+        <button type="button" class="btn btn-primary" name="save" value="save" id="save" onclick="save()">Lưu</button>
+    </div>
+</div>
+<div class="row mt-3">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <td>STT</td>
+                <td>MASV</td>
+                <td>TÊN SV</td>
+                <td>THAO TÁC</td>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var i = 1;
+                foreach (var item in sv.findSvVT2(ViewBag.id_vt))
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@item.MASV</td>
+                        <td>@item.TENSV</td>
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="showFromDisbled(@item.ID_SV,'@item.TENSV.ToString()',1,'@ViewBag.id_vt')">Xóa</button>
+                        </td>
+                    </tr>
+                }
+                i++;
+            }
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+    function save() {
+        if ($("#sinh_vien").val().length == 0) {
+            $('#dialog-err').text('Vui lòng chọn sinh viên');
+            return;
+        }
+        var dataList = [];
+        var id_vt = @ViewBag.id_vt;
+        var data = {
+            sinh_vien: $('#sinh_vien').val(),
+            id_vt:id_vt+""
+        }
+        dataList.push(data);
+        $.ajax({
+            url: '/Admin/saveSvVaoVt',
+            data: { cartModel: JSON.stringify(dataList) },
+            dataType: 'json',
+            type: 'POST',
+            success: function (res) {
+                if (res.res == 0) {
+                    $('#dialog-err').text("Đã xảy ra lỗi");
+                }
+                else {
+                    location.reload();
+                }
+            }
+        })
+    }
+
+    function showFromDisbled(id, name, disabled,idvt) {
+        var dataList = [];
+        var data = {
+            ID_VAI_TRO: idvt+"",
+            ID_SV: id+"",
+            disabled: disabled.toString()
+        };
+        var title = "";
+        if (disabled == 0) {
+            title = "Xóa";
+        }
+        dataList.push(data);
+        var dialog = bootbox.dialog({
+            title: title + ' khỏi danh sách',
+            message: 'Bạn có muốn ' + title + ' '+ name + ' khỏi danh sách',
+            buttons: {
+                ok: {
+                    label: "Đồng ý",
+                    className: 'btn-primary input-sm',
+                    callback: function () {
+                        $.ajax({
+                            url: '/Admin/updateSvVaoVt',
+                            data: { cartModel: JSON.stringify(dataList) },
+                            dataType: 'json',
+                            type: 'POST',
+                            success: function (res) {
+                                location.reload();
+                            }
+                        })
+                    }
+                },
+                cancel: {
+                    label: "Bỏ qua",
+                    className: 'btn-default input-sm',
+                    callback: function () {
+                        console.log('Bỏ qua');
+                    }
+                }
+            }
+        });
+    }
+</script>

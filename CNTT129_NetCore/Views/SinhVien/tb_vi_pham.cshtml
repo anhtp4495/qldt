@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "tb_hoat_dong";
+}
+@using CNTT129.Models;
+<div class="col-md-3 col-lg-3 col-xl-3 col-sm-3">
+    <label>Hoạt động/ Quy phạm</label><br />
+</div>
+<div class="col-md-9 col-lg-9 col-xl-9 col-sm-9">
+    <select class="form-select" style="height:35px;width:100%" id="hoat_dong">
+        <option value="">Chọn loại vi phạm</option>
+        @{
+            if (ViewData["data_list"] != null)
+            {
+                foreach (var item in ViewData["data_list"] as List<VI_PHAM>)
+                {
+                    <option value="@item.ID_VI_PHAM">@item.MA_VI_PHAM - @item.TENNQ</option>
+                }
+            }
+        }
+    </select>
+</div>
