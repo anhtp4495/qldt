@@ -43,6 +43,6 @@ AppSettings.ConnectionString = configuration.GetValue<string>("ConnectionString"
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Admin}/{action=Login}/{id?}");
+    pattern: "{controller=Admin}/{action=Home}/{id?}");
 
 app.Run();
