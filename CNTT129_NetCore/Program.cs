@@ -13,6 +13,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,6 +38,7 @@ app.UseSession();
 //{
 //    AppSettings.ConnectionString = setting.GetValue<string>("ConnectionString");
 //});
+
 
 ServiceProvider provider = builder.Services.BuildServiceProvider();
 IConfiguration? configuration = provider.GetService<IConfiguration>();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using CNTT129_NetCore.Extensions;
@@ -27,19 +27,19 @@ namespace CNTT129.Models
 
         public List<GIANG_VIEN> login(string user, string password)
         {
-            MySqlConnection con = new MySqlConnection(conf);
+            SqlConnection con = new SqlConnection(conf);
             var sql = "select GIANG_VIEN.*,TEN_VAI_TRO from GIANG_VIEN,VAI_TRO where magv='" + user + "' and matkhau='" + password + "' and GIANG_VIEN.disabled = 0 and GIANG_VIEN.ID_VAI_TRO = VAI_TRO.ID_VAI_TRO and VAI_TRO.disabled = 0";
             if (user == "admin")
             {
                 sql = "select GIANG_VIEN.*,'Administrator' as TEN_VAI_TRO from GIANG_VIEN where magv='" + user + "' and matkhau='" + password + "'";
             }
-            MySqlCommand cmd2 = new MySqlCommand(sql, con);
+            SqlCommand cmd2 = new SqlCommand(sql, con);
             cmd2.CommandType = CommandType.Text;
             con.Open();
             List<GIANG_VIEN> listGV = new List<GIANG_VIEN>();
             try
             {
-                MySqlDataReader dr = cmd2.ExecuteReader();
+                SqlDataReader dr = cmd2.ExecuteReader();
                 while (dr.Read())
                 {
                     GIANG_VIEN emp = new GIANG_VIEN();
@@ -113,11 +113,11 @@ namespace CNTT129.Models
             }
 
             List<GIANG_VIEN> listGV = new List<GIANG_VIEN>();
-            MySqlConnection con = new MySqlConnection(conf);
-            MySqlCommand cmd = new MySqlCommand("select GIANG_VIEN.* from GIANG_VIEN " + sql, con);
+            SqlConnection con = new SqlConnection(conf);
+            SqlCommand cmd = new SqlCommand("select GIANG_VIEN.* from GIANG_VIEN " + sql, con);
             cmd.CommandType = CommandType.Text;
             con.Open();
-            MySqlDataReader dr = cmd.ExecuteReader();
+            SqlDataReader dr = cmd.ExecuteReader();
             while (dr.Read())
             {
                 GIANG_VIEN emp = new GIANG_VIEN();
@@ -141,15 +141,15 @@ namespace CNTT129.Models
         public List<GIANG_VIEN> findByID(int id)
         {
             string sql = null;
-            MySqlConnection con = new MySqlConnection(conf);
+            SqlConnection con = new SqlConnection(conf);
             List<GIANG_VIEN> listGV = new List<GIANG_VIEN>();
             if (id != 0)
             {
                 sql = "where ID_GV = '" + id + "'";
-                MySqlCommand cmd = new MySqlCommand("select GIANG_VIEN.* from GIANG_VIEN " + sql, con);
+                SqlCommand cmd = new SqlCommand("select GIANG_VIEN.* from GIANG_VIEN " + sql, con);
                 cmd.CommandType = CommandType.Text;
                 con.Open();
-                MySqlDataReader dr = cmd.ExecuteReader();
+                SqlDataReader dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
                     GIANG_VIEN emp = new GIANG_VIEN();
@@ -174,10 +174,10 @@ namespace CNTT129.Models
         public int save(string id, string ma, string ten, string sdt, string dc, string mk, string khoa, string email, string vai_tro, string ngaysinh)
         {
             int dr = 0;
-            MySqlConnection con = new MySqlConnection(conf);
+            SqlConnection con = new SqlConnection(conf);
             if (id == "0")
             {
-                MySqlCommand cmd2 = new MySqlCommand("select count(*) from GIANG_VIEN", con);
+                SqlCommand cmd2 = new SqlCommand("select count(*) from GIANG_VIEN", con);
                 cmd2.CommandType = CommandType.Text;
                 con.Open();
                 Object kq = cmd2.ExecuteScalar();
@@ -200,7 +200,7 @@ namespace CNTT129.Models
                     }
                 }
                 ma = "GV00" + number2;
-                MySqlCommand cmd = new MySqlCommand("insert into GIANG_VIEN(MAGV,TENGV,SDT,DC,MATKHAU,ID_KHOA,EMAIL,ID_VAI_TRO,NGAYSINH) values(N'" + ma + "',N'" + ten + "','" + sdt + "',N'" + dc + "','" + mk + "','" + khoa + "','" + email + "','" + vai_tro + "','" + ngaysinh + "')", con);
+                SqlCommand cmd = new SqlCommand("insert into GIANG_VIEN(MAGV,TENGV,SDT,DC,MATKHAU,ID_KHOA,EMAIL,ID_VAI_TRO,NGAYSINH) values(N'" + ma + "',N'" + ten + "','" + sdt + "',N'" + dc + "','" + mk + "','" + khoa + "','" + email + "','" + vai_tro + "','" + ngaysinh + "')", con);
                 cmd.CommandType = CommandType.Text;
                 dr = cmd.ExecuteNonQuery();
                 con.Close();
@@ -208,20 +208,20 @@ namespace CNTT129.Models
             else
             {
                 con.Open();
-                MySqlCommand cmd = new MySqlCommand("update GIANG_VIEN set TENGV= N'" + ten + "',SDT = '" + sdt + "',dc = N'" + dc + "',matkhau = N'" + mk + "',email = '" + email + "',ID_KHOA = '" + khoa + "',ID_VAI_TRO = '" + vai_tro + "',NGAYSINH = '" + ngaysinh + "' where MAGV='" + ma + "'", con);
+                SqlCommand cmd = new SqlCommand("update GIANG_VIEN set TENGV= N'" + ten + "',SDT = '" + sdt + "',dc = N'" + dc + "',matkhau = N'" + mk + "',email = '" + email + "',ID_KHOA = '" + khoa + "',ID_VAI_TRO = '" + vai_tro + "',NGAYSINH = '" + ngaysinh + "' where MAGV='" + ma + "'", con);
                 cmd.CommandType = CommandType.Text;
                 dr = cmd.ExecuteNonQuery();
                 con.Close();
 
                 con.Open();
-                MySqlCommand cmd3 = new MySqlCommand("delete from LOAIQUYENOFGV where ID_GV='" + id + "'", con);
+                SqlCommand cmd3 = new SqlCommand("delete from LOAIQUYENOFGV where ID_GV='" + id + "'", con);
                 cmd3.CommandType = CommandType.Text;
                 dr = cmd3.ExecuteNonQuery();
                 con.Close();
             }
             if (id == "0")
             {
-                MySqlCommand cmd2 = new MySqlCommand("select top 1 ID_GV from GIANG_VIEN order by ID_GV DESC", con);
+                SqlCommand cmd2 = new SqlCommand("select top 1 ID_GV from GIANG_VIEN order by ID_GV DESC", con);
                 cmd2.CommandType = CommandType.Text;
                 con.Open();
                 Object kq = cmd2.ExecuteScalar();
@@ -231,7 +231,7 @@ namespace CNTT129.Models
                 foreach (var item in menu)
                 {
                     con.Open();
-                    MySqlCommand cmd = new MySqlCommand("insert into LOAIQUYENOFGV(ID_GV,ID_LOAI_QUYEN) values(N'" + kq + "',N'" + item.ID + "')", con);
+                    SqlCommand cmd = new SqlCommand("insert into LOAIQUYENOFGV(ID_GV,ID_LOAI_QUYEN) values(N'" + kq + "',N'" + item.ID + "')", con);
                     cmd.CommandType = CommandType.Text;
                     dr = cmd.ExecuteNonQuery();
                     con.Close();
@@ -244,7 +244,7 @@ namespace CNTT129.Models
                 foreach (var item in menu)
                 {
                     con.Open();
-                    MySqlCommand cmd = new MySqlCommand("insert into LOAIQUYENOFGV(ID_GV,ID_LOAI_QUYEN) values(N'" + id + "',N'" + item.ID + "')", con);
+                    SqlCommand cmd = new SqlCommand("insert into LOAIQUYENOFGV(ID_GV,ID_LOAI_QUYEN) values(N'" + id + "',N'" + item.ID + "')", con);
                     cmd.CommandType = CommandType.Text;
                     dr = cmd.ExecuteNonQuery();
                     con.Close();
@@ -255,13 +255,13 @@ namespace CNTT129.Models
         public int updateTT(int id, int disabled)
         {
             int dr = 0;
-            MySqlConnection con = new MySqlConnection(conf);
+            SqlConnection con = new SqlConnection(conf);
             con.Open();
             string sql = "";
             sql = "update GIANG_VIEN set disabled = " + disabled + " where ID_GV =" + id;
             if (sql != "")
             {
-                MySqlCommand cmd = new MySqlCommand(sql, con);
+                SqlCommand cmd = new SqlCommand(sql, con);
                 cmd.CommandType = CommandType.Text;
                 dr = cmd.ExecuteNonQuery();
             }
