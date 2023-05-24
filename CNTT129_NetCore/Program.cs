@@ -5,15 +5,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    options.IdleTimeout = TimeSpan.FromDays(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddHttpContextAccessor();
+
+ServiceProvider provider = builder.Services.BuildServiceProvider();
+IConfiguration? configuration = provider.GetService<IConfiguration>();
+AppSettings.ConnectionString = configuration.GetValue<string>("ConnectionString");
 
 var app = builder.Build();
 
@@ -33,16 +37,6 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.UseSession();
-
-//builder.Services.AddOptions<AppSettings>().Configure<IConfiguration>((options, setting) =>
-//{
-//    AppSettings.ConnectionString = setting.GetValue<string>("ConnectionString");
-//});
-
-
-ServiceProvider provider = builder.Services.BuildServiceProvider();
-IConfiguration? configuration = provider.GetService<IConfiguration>();
-AppSettings.ConnectionString = configuration.GetValue<string>("ConnectionString");
 
 app.MapControllerRoute(
     name: "default",
