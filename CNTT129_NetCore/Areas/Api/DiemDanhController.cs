@@ -11,9 +11,9 @@ namespace CNTT129_NetCore.Areas.Api
     public class DiemDanhController : ControllerBase
     {
         // GET: <api>/<version>/<AttendanceController>
-        [HttpPost]
+        [HttpGet]
         [Authorize]
-        public IActionResult Get([FromBody] DiemDanhModel model)
+        public IActionResult Get([FromQuery] DiemDanhModel model)
         {
             DIEMDANH dd = new DIEMDANH();
             List<DIEMDANH> danhSachDiemDanh = dd.danhSachHD(model.MaHoatDong, model.TrangThai);
