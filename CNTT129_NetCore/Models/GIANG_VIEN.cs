@@ -28,12 +28,14 @@ namespace CNTT129_NetCore.Models
         public List<GIANG_VIEN> login(string user, string password)
         {
             SqlConnection con = new SqlConnection(conf);
-            var sql = "select GIANG_VIEN.*,TEN_VAI_TRO from GIANG_VIEN,VAI_TRO where magv='" + user + "' and matkhau='" + password + "' and GIANG_VIEN.disabled = 0 and GIANG_VIEN.ID_VAI_TRO = VAI_TRO.ID_VAI_TRO and VAI_TRO.disabled = 0";
+            var sql = "select GIANG_VIEN.*,TEN_VAI_TRO from GIANG_VIEN,VAI_TRO where magv=@user and matkhau=@password and GIANG_VIEN.disabled = 0 and GIANG_VIEN.ID_VAI_TRO = VAI_TRO.ID_VAI_TRO and VAI_TRO.disabled = 0";
             if (user == "admin")
             {
-                sql = "select GIANG_VIEN.*,'Administrator' as TEN_VAI_TRO from GIANG_VIEN where magv='" + user + "' and matkhau='" + password + "'";
+                sql = "select GIANG_VIEN.*,'Administrator' as TEN_VAI_TRO from GIANG_VIEN where magv=@user and matkhau=@password";
             }
             SqlCommand cmd2 = new SqlCommand(sql, con);
+            cmd2.Parameters.Add(new SqlParameter("user", user));
+            cmd2.Parameters.Add(new SqlParameter("password", password));
             cmd2.CommandType = CommandType.Text;
             con.Open();
             List<GIANG_VIEN> listGV = new List<GIANG_VIEN>();
