@@ -34,8 +34,10 @@ namespace CNTT129_NetCore.Models
         public List<SINHVIEN> login(string user, string password)
         {
             SqlConnection con = new SqlConnection(conf);
-            var sql = "select SINHVIEN.* from SINHVIEN where MASV='" + user + "' and matkhau='" + password + "' and disabled = 0";
+            var sql = "select SINHVIEN.* from SINHVIEN where MASV=@user and matkhau=@password and disabled = 0";
             SqlCommand cmd2 = new SqlCommand(sql, con);
+            cmd2.Parameters.Add(new SqlParameter("user", user));
+            cmd2.Parameters.Add(new SqlParameter("password", password));
             cmd2.CommandType = CommandType.Text;
             con.Open();
             List<SINHVIEN> listSV = new List<SINHVIEN>();

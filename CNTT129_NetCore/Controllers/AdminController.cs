@@ -496,7 +496,7 @@ namespace CNTT129_NetCore.Controllers
             string ngay_bd_dk_hd = jsonCart[0]["ngay_bd_dk_hd"];
             string ngay_kt_dk_hd = jsonCart[0]["ngay_kt_dk_hd"];
             string ngay_tao = jsonCart[0]["ngay_tao"];
-            string reslut = hd.save(ten_hd, noi_dung, ngay_bd_dk_hd, ngay_kt_dk_hd, khoa, hocky, so_nguoi_hd, diem_hd, ghi_chu_hd, loai_hd, hinh_anh, Session["id_gv"].ToString(), ngay_tao, dia_diem_hd);
+            string reslut = hd.save(ten_hd, noi_dung, ngay_bd_dk_hd, ngay_kt_dk_hd, khoa, hocky, so_nguoi_hd, diem_hd, ghi_chu_hd, loai_hd, hinh_anh, Session.Get<string>("id_gv"), ngay_tao, dia_diem_hd);
             int id_hd = 0;
             foreach (var item in hd.findByCode(reslut))
             {
@@ -599,7 +599,7 @@ namespace CNTT129_NetCore.Controllers
             string tt = jsonCart[0]["trangthai"];
             int id = jsonCart[0]["ID"];
             string ngay = jsonCart[0]["ngay"];
-            int reslut = hk.updateTT(id, int.Parse(tt), ngay, Session["id_gv"].ToString());
+            int reslut = hk.updateTT(id, int.Parse(tt), ngay, Session.Get<string>("id_gv"));
             if (int.Parse(tt) == 2)
             {
                 hdb.huyAllHdb(id);
@@ -663,7 +663,7 @@ namespace CNTT129_NetCore.Controllers
             string ngay_kt_dk_hd = jsonCart[0]["ngay_kt_dk_hd"];
             string ngay_sua = jsonCart[0]["ngay_tao"];
             string dia_diem_hd = jsonCart[0]["dia_diem_hd"];
-            int reslut = hd.updatehd(id_hd, ten_hd, noi_dung, ngay_bd_dk_hd, ngay_kt_dk_hd, khoa, hocky, so_nguoi_hd, diem_hd, ghi_chu_hd, loai_hd, hinh_anh, Session["id_gv"].ToString(), ngay_sua, dia_diem_hd);
+            int reslut = hd.updatehd(id_hd, ten_hd, noi_dung, ngay_bd_dk_hd, ngay_kt_dk_hd, khoa, hocky, so_nguoi_hd, diem_hd, ghi_chu_hd, loai_hd, hinh_anh, Session.Get<string>("id_gv"), ngay_sua, dia_diem_hd);
             hdb.updateTT(id_hd, 1);
             var detail = jsonCart[0]["detail"];
             foreach (var item in detail)
@@ -744,7 +744,7 @@ namespace CNTT129_NetCore.Controllers
             {
                 return RedirectToAction("Login", "Admin");
             }
-            ViewBag.QRCode = Session["ma_qr"];
+            ViewBag.QRCode = Session.Get<string>("ma_qr");
             return View();
         }
 
@@ -761,7 +761,7 @@ namespace CNTT129_NetCore.Controllers
             var ngay = date2.ToString("yyyy-MM-dd");
             if (hdb.laySlBuoiHdChuaHuy(id) == 0)
             {
-                hd.updateTT(id, 2, ngay, Session["id_gv"].ToString());
+                hd.updateTT(id, 2, ngay, Session.Get<string>("id_gv"));
             }
             return Json(new
             {
@@ -784,7 +784,7 @@ namespace CNTT129_NetCore.Controllers
             {
                 if (hdb.laySlBuoiHdChuaDongDangKy(idhd) == 0)
                 {
-                    hd.updateTINHTRANG(idhd, 1, ngay, Session["id_gv"].ToString());
+                    hd.updateTINHTRANG(idhd, 1, ngay, Session.Get<string>("id_gv"));
                 }
             }
             else
@@ -792,7 +792,7 @@ namespace CNTT129_NetCore.Controllers
                 dk.capnhatKhongThamGiaTatCa(id);
                 if (hdb.laySlBuoiHdChuaDongDiemDanh(idhd) == hdb.countHd(idhd))
                 {
-                    hd.updateTINHTRANG(idhd, 2, ngay, Session["id_gv"].ToString());
+                    hd.updateTINHTRANG(idhd, 2, ngay, Session.Get<string>("id_gv"));
                 }
             }
             return Json(new
@@ -817,7 +817,7 @@ namespace CNTT129_NetCore.Controllers
             {
                 if (hdb.laySlBuoiHdChuaDongDangKy(idhd) == 0)
                 {
-                    hd.updateTINHTRANG(idhd, 1, ngay, Session["id_gv"].ToString());
+                    hd.updateTINHTRANG(idhd, 1, ngay, Session.Get<string>("id_gv"));
                 }
             }
             else
@@ -825,7 +825,7 @@ namespace CNTT129_NetCore.Controllers
                 dk.capnhatKhongThamGiaTatCa(id);
                 if (hdb.laySlBuoiHdChuaDongDiemDanh(idhd) == hdb.countHd(idhd))
                 {
-                    hd.updateTINHTRANG(idhd, 2, ngay, Session["id_gv"].ToString());
+                    hd.updateTINHTRANG(idhd, 2, ngay, Session.Get<string>("id_gv"));
                 }
             }
             return Json(new
@@ -1004,7 +1004,7 @@ namespace CNTT129_NetCore.Controllers
             VI_PHAM vi_pham = new VI_PHAM();
             foreach (var item in jsonCart[0]["sinh_vien"])
             {
-                vi_pham.save(jsonCart[0]["tieu_de"], jsonCart[0]["noi_dung"], Session["id_gv"].ToString(), jsonCart[0]["ngay_tao"], jsonCart[0]["noi_quy"], item, idhk);
+                vi_pham.save(jsonCart[0]["tieu_de"], jsonCart[0]["noi_dung"], Session.Get<string>("id_gv"), jsonCart[0]["ngay_tao"], jsonCart[0]["noi_quy"], item, idhk);
             }
             return Json(new
             {
@@ -1094,7 +1094,7 @@ namespace CNTT129_NetCore.Controllers
             string id = jsonCart[0]["ID"];
             string tt = jsonCart[0]["tt"];
 
-            int reslut = phan_hoi.updateTT2(id, tt, Session["id_gv"].ToString());
+            int reslut = phan_hoi.updateTT2(id, tt, Session.Get<string>("id_gv"));
 
             return Json(new
             {
@@ -1396,7 +1396,7 @@ namespace CNTT129_NetCore.Controllers
             }
             return Json(new
             {
-                res = hdn.save(jsonCart[0]["id_hd"], jsonCart[0]["noi_dung"], jsonCart[0]["dia_diem"], idhk, jsonCart[0]["hinh_anh"], jsonCart[0]["sinh_vien"], Session["id_gv"].ToString(), "0", jsonCart[0]["lhdn_edit"]),
+                res = hdn.save(jsonCart[0]["id_hd"], jsonCart[0]["noi_dung"], jsonCart[0]["dia_diem"], idhk, jsonCart[0]["hinh_anh"], jsonCart[0]["sinh_vien"], Session.Get<string>("id_gv"), "0", jsonCart[0]["lhdn_edit"]),
             });
         }
 
