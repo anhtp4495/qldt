@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using PagedList;
 using CNTT129_NetCore.Settings;
 
 namespace CNTT129_NetCore.Models
@@ -505,7 +506,7 @@ namespace CNTT129_NetCore.Models
                 listHD.Add(emp);
             }
             con.Close();
-            return listHD.OrderBy(x => x.IDHD).Skip(page * pagesize).Take(pagesize);
+            return listHD.OrderBy(x => x.IDHD).ToPagedList(page, pagesize);
         }
 
         public int laySoNguoiDk(string ID_HD)
