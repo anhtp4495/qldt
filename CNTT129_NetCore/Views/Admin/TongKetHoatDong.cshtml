@@ -2,7 +2,7 @@
     ViewBag.Title = "TongKetHoatDong";
     Layout = "~/Views/Shared/_Layout_Admin.cshtml";
 }
-@using CNTT129.Models;
+@using CNTT129_NetCore.Models;
 @{
     KHOA khoa = new KHOA();
     var menu_khoa = khoa.find("", "", "0");
@@ -120,7 +120,7 @@
             if (ViewData["data"] != null)
             {
                 int i = 1;
-                foreach (var std in ViewData["data"] as IList<CNTT129.Models.HoatDongBuoi>)
+                foreach (var std in ViewData["data"] as IList<CNTT129_NetCore.Models.HoatDongBuoi>)
                 {
                     DateTime ngay_dd = DateTime.Parse(std.NGAYDIEMDANH);
                     var datedd = ngay_dd.ToString("dd/MM/yyyy");

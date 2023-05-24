@@ -4,9 +4,9 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
-using CNTT129_NetCore.Extensions;
+using CNTT129_NetCore.Settings;
 
-namespace CNTT129.Models
+namespace CNTT129_NetCore.Models
 {
     public class HOATDONGNGOAI
     {

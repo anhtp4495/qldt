@@ -1,5 +1,3 @@
-using CNTT129_NetCore.Extensions;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,11 +11,6 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
-
-ServiceProvider provider = builder.Services.BuildServiceProvider();
-IConfiguration? configuration = provider.GetService<IConfiguration>();
-AppSettings.ConnectionString = configuration.GetValue<string>("ConnectionString");
 
 var app = builder.Build();
 

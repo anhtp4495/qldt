@@ -4,7 +4,7 @@
 }
 @using Microsoft.AspNetCore.Http
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@using CNTT129.Models;
+@using CNTT129_NetCore.Models;
 @using CNTT129_NetCore.Extensions;
 @{
     string gvID = HttpContextAccessor.HttpContext.Session.Get<string>("id_gv");
@@ -98,7 +98,7 @@
                     if (ViewData["data"] != null)
                     {
                         int i = 1;
-                        foreach (var std in ViewData["data"] as IList<CNTT129.Models.VI_PHAM>)
+                        foreach (var std in ViewData["data"] as IList<CNTT129_NetCore.Models.VI_PHAM>)
                         {
                             <tr>
                                 <td>@i</td>

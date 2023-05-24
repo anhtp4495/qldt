@@ -8,10 +8,10 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Text.Json;
 using CNTT129_NetCore.Controllers;
-using CNTT129.Models;
+using CNTT129_NetCore.Models;
 using QRCoder;
 
-namespace CNTT129.Controllers
+namespace CNTT129_NetCore.Controllers
 {
     public class SinhVienController : BaseController
     {
