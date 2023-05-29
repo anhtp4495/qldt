@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CNTT129_NetCore.Attributes;
 using Microsoft.AspNetCore.Authorization;
-using CNTT129_NetCore.Models;
 using System.Text.Json;
+using CNTT129_NetCore.Models.Api;
+using CNTT129_NetCore.Models;
 
 namespace CNTT129_NetCore.Areas.Api
 {

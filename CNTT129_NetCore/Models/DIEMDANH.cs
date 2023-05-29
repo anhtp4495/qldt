@@ -33,14 +33,14 @@ namespace CNTT129_NetCore.Models
         public string MAHD { get; set; }
         public string TENHK { get; set; }
 
-        public int ktTraSvDiemDanh(string idbuoi,string idsv)
+        public int ktTraSvDiemDanh(string idbuoi, string idsv)
         {
             int dr = 0;
             SqlConnection con = new SqlConnection(conf);
             SqlCommand cmd2 = new SqlCommand("select count(*) from DIEMDANH where IDBUOI=" + idbuoi + " and trangthai = 0 and IDSV =" + idsv + "", con);
             cmd2.CommandType = CommandType.Text;
             con.Open();
-            Object kq = cmd2.ExecuteScalar();
+            object kq = cmd2.ExecuteScalar();
             con.Close();
             return int.Parse(kq.ToString());
         }
@@ -52,7 +52,7 @@ namespace CNTT129_NetCore.Models
             SqlCommand cmd2 = new SqlCommand("select count(*) from DIEMDANH where IDBUOI='" + idbuoi + "' and idsv = " + idsv, con);
             cmd2.CommandType = CommandType.Text;
             con.Open();
-            Object kq = cmd2.ExecuteScalar();
+            object kq = cmd2.ExecuteScalar();
             con.Close();
             return int.Parse(kq.ToString());
         }
@@ -64,7 +64,7 @@ namespace CNTT129_NetCore.Models
             SqlCommand cmd2 = new SqlCommand("select count(*) from DIEMDANH where trangthai = 0 and IDSV =" + idsv + "", con);
             cmd2.CommandType = CommandType.Text;
             con.Open();
-            Object kq = cmd2.ExecuteScalar();
+            object kq = cmd2.ExecuteScalar();
             con.Close();
             return int.Parse(kq.ToString());
         }
@@ -164,7 +164,7 @@ namespace CNTT129_NetCore.Models
             SqlCommand cmd2 = new SqlCommand("select count(*) from DIEMDANH where IDBUOI= " + IDBUOI + " " + sql, con);
             cmd2.CommandType = CommandType.Text;
             con.Open();
-            Object kq = cmd2.ExecuteScalar();
+            object kq = cmd2.ExecuteScalar();
             int dr = int.Parse(kq.ToString());
             con.Close();
             return dr;
