@@ -53,6 +53,6 @@ app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Admin}/{action=Home}/{id?}");
+    pattern: "{controller=SinhVien}/{action=Home}/{id?}");
 
 app.Run();

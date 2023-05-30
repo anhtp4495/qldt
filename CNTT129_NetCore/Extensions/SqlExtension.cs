@@ -38,5 +38,19 @@ namespace CNTT129_NetCore.Extensions
             catch { }
             return string.Empty;
         }
+
+        public static List<string> GetListStringOrDefault(this SqlDataReader dr, string name)
+        {
+            try
+            {
+                if (!dr.IsDBNull(name))
+                {
+                    string str = dr.GetString(name);
+                    return str.Split(new[] { ',' }).ToList();
+                }
+            }
+            catch { }
+            return new List<string>();
+        }
     }
 }
