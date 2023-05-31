@@ -34,7 +34,10 @@ namespace CNTT129_NetCore.Areas.Api
             var kq = gv.login(user.UserName, user.Password);
             if (kq.Count == 0)
             {
-                return Ok("Tài Khoản bạn khóa hoặc sai mật mật khẩu! Vui lòng liên hệ admin để đc giải quyết");
+                return Unauthorized(JsonSerializer.Serialize<dynamic>(new
+                {
+                    error_message = "Tài Khoản bạn khóa hoặc sai mật mật khẩu! Vui lòng liên hệ admin để đc giải quyết"
+                }));
             }
 
             string accessToken = GenerateAccessToken(kq[0]);
