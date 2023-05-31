@@ -15,7 +15,7 @@ namespace CNTT129_NetCore.Models.Api
 
     public class HoatDongModel
     {
-        public int    MaHoatDong      { get; set; }
+        public string MaHoatDong      { get; set; }
         public string TieuDe          { get; set; } = string.Empty;
         public string NoiDung         { get; set; } = string.Empty;
         public string NguoiTao        { get; set; } = string.Empty;
@@ -34,7 +34,7 @@ namespace CNTT129_NetCore.Models.Api
                 {
                     SqlCommand cmd = new SqlCommand(@"
 SELECT 
-	HOATDONG.IDHD                                      MaHoatDong,
+	HOATDONG.MAHD                                      MaHoatDong,
 	HOATDONG.TIEUDE                                    TieuDe,
 	HOATDONG.NOIDUNG                                   NoiDung,
 	GIANG_VIEN.TENGV                                   NguoiTao,
@@ -69,7 +69,7 @@ ORDER BY ThoiGianKetThuc", con);
                     {
                         danhsachHoatDong.Add(new HoatDongModel
                         {
-                            MaHoatDong      = dr.GetInt32OrDefault("MaHoatDong"),
+                            MaHoatDong      = dr.GetStringOrDefault("MaHoatDong"),
                             TieuDe          = dr.GetStringOrDefault("TieuDe"),
                             NoiDung         = dr.GetStringOrDefault("NoiDung"),
                             NguoiTao        = dr.GetStringOrDefault("NguoiTao"),
