@@ -27,9 +27,9 @@ namespace CNTT129_NetCore.Areas.Api
         [HttpGet]
         [Authorize]
         [Route("DanhSachBuoi")]
-        public IActionResult GetDanhSachBuoi([FromQuery] int maHoatDong)
+        public IActionResult GetDanhSachBuoi([FromQuery] BuoiDiemDanhSearchModel searchModel)
         {
-            List<BuoiDiemDanhModel> danhSachBuoiDiemDanh = BuoiDiemDanhModel.GetDanhSachBuoi(maHoatDong);
+            List<BuoiDiemDanhModel> danhSachBuoiDiemDanh = BuoiDiemDanhModel.GetDanhSachBuoi(searchModel);
             return Ok(JsonSerializer.Serialize<dynamic>(new
             {
                 danh_sach_buoi = danhSachBuoiDiemDanh
