@@ -81,7 +81,7 @@ SELECT
 FROM HOATDONGTHEONGAY HDTN
 INNER JOIN HOATDONG HD
 ON HDTN.IDHD = HD.IDHD
-WHERE IDHD = @maHoatDong
+WHERE HD.IDHD = @maHoatDong
 ORDER BY NGAYBATDAUDIEMDANH, LOAI_BUOI", con);
                     cmd.Parameters.Add(new SqlParameter("maHoatDong", searchModel.MaHoatDong));
                     cmd.CommandType = CommandType.Text;
