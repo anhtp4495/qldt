@@ -44,8 +44,8 @@ GROUP BY SINHVIEN.MASV, SINHVIEN.TENSV", con);
                     {
                         danhSachSinhVien.Add(new SinhVienModel
                         {
-                            MaSinhVien = dr.GetStringOrDefault("MaSinhVien"),
-                            TenSinhVien = dr.GetStringOrDefault("TenSinhVien"),
+                            MaSinhVien      = dr.GetStringOrDefault("MaSinhVien"),
+                            TenSinhVien     = dr.GetStringOrDefault("TenSinhVien"),
                             DanhSachThietBi = dr.GetListStringOrDefault("DanhSachThietBi")
                         });
                     }
