@@ -7,7 +7,7 @@ namespace CNTT129_NetCore.Models.Api
 {
     public class SinhVienModel
     {
-        public string?         MaSinhVien     { get; set; } = string.Empty;
+        public string?      MaSinhVien        { get; set; } = string.Empty;
         public string?      TenSinhVien       { get; set; } = string.Empty;
         public List<string> DanhSachThietBi   { get; set; } = new List<string>();
 
@@ -22,7 +22,7 @@ namespace CNTT129_NetCore.Models.Api
 SELECT
 	SINHVIEN.MASV                                   MaSinhVien,
     SINHVIEN.TENSV                                  TenSinhVien,
-    STRING_AGG(TB.MATHIETBI, ', ') as DanhSachThietBi
+    STRING_AGG(TB.MATHIETBI, ', ') as               DanhSachThietBi
 FROM (
 	SELECT *
 	FROM HOATDONGTHEONGAY
