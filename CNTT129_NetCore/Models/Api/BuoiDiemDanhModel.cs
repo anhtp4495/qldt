@@ -12,10 +12,11 @@ namespace CNTT129_NetCore.Models.Api
     }
     public class BuoiDiemDanhModel
     {
-        public string MaBuoi { get; set; }          = string.Empty;
-        public int    LoaiBuoi { get; set; }        = 0;
-        public string TenBuoi { get; set; }         = string.Empty;
-        public string ThoiGianBatDau { get; set; }  = string.Empty;
+        public string MaHoatDong      { get; set; } = string.Empty;
+        public string MaBuoi          { get; set; } = string.Empty;
+        public int    LoaiBuoi        { get; set; } = 0;
+        public string TenBuoi         { get; set; } = string.Empty;
+        public string ThoiGianBatDau  { get; set; } = string.Empty;
         public string ThoiGianKetThuc { get; set; } = string.Empty;
 
         private static List<BuoiDiemDanhModel> GetDanhSachBuoiTheoNgay(string ngayBatDau)
@@ -27,11 +28,14 @@ namespace CNTT129_NetCore.Models.Api
                 {
                     SqlCommand cmd = new SqlCommand(@"
 SELECT
+    HD.MAHD                                                MaHoatDong,
 	IDBUOI                                                 MaBuoi,
 	LOAI_BUOI                                              LoaiBuoi,
 	CONVERT(varchar(20), HDTN.NGAYBATDAUDIEMDANH, 105)     ThoiGianBatDau,
 	CONVERT(varchar(20), HDTN.NGAYKETTHUCDIEnDANH, 105)    ThoiGianKetThuc
 FROM HOATDONGTHEONGAY HDTN
+INNER JOIN HOATDONG HD
+ON HDTN.IDHD = HD.IDHD
 WHERE DATEDIFF(day, HDTN.NGAYBATDAUDIEMDANH, @ngayBatDau) = 0
 ORDER BY NGAYBATDAUDIEMDANH, LOAI_BUOI", con);
                     cmd.Parameters.Add(new SqlParameter("ngayBatDau", ngayBatDau.ToSqlDateTime(DateTime.Now)));
@@ -42,6 +46,7 @@ ORDER BY NGAYBATDAUDIEMDANH, LOAI_BUOI", con);
                     {
                         danhSachSinhVien.Add(new BuoiDiemDanhModel
                         {
+                            MaHoatDong      = dr.GetStringOrDefault("MaHoatDong"),
                             MaBuoi          = dr.GetStringOrDefault("MaBuoi"),
                             LoaiBuoi        = dr.GetInt32OrDefault("LoaiBuoi"),
                             TenBuoi         = dr.GetInt32OrDefault("LoaiBuoi").ConvertLoai2TenBuoi(),
@@ -68,11 +73,14 @@ ORDER BY NGAYBATDAUDIEMDANH, LOAI_BUOI", con);
                 {
                     SqlCommand cmd = new SqlCommand(@"
 SELECT
+    HD.MAHD                                                MaHoatDong,
 	IDBUOI                                                 MaBuoi,
 	LOAI_BUOI                                              LoaiBuoi,
 	CONVERT(varchar(20), HDTN.NGAYBATDAUDIEMDANH, 105)     ThoiGianBatDau,
 	CONVERT(varchar(20), HDTN.NGAYKETTHUCDIEnDANH, 105)    ThoiGianKetThuc
 FROM HOATDONGTHEONGAY HDTN
+INNER JOIN HOATDONG HD
+ON HDTN.IDHD = HD.IDHD
 WHERE IDHD = @maHoatDong
 ORDER BY NGAYBATDAUDIEMDANH, LOAI_BUOI", con);
                     cmd.Parameters.Add(new SqlParameter("maHoatDong", searchModel.MaHoatDong));
@@ -83,6 +91,7 @@ ORDER BY NGAYBATDAUDIEMDANH, LOAI_BUOI", con);
                     {
                         danhSachSinhVien.Add(new BuoiDiemDanhModel
                         {
+                            MaHoatDong      = dr.GetStringOrDefault("MaHoatDong"),
                             MaBuoi          = dr.GetStringOrDefault("MaBuoi"),
                             LoaiBuoi        = dr.GetInt32OrDefault("LoaiBuoi"),
                             TenBuoi         = dr.GetInt32OrDefault("LoaiBuoi").ConvertLoai2TenBuoi(),
