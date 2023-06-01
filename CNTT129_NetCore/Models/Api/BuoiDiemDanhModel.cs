@@ -21,8 +21,8 @@ namespace CNTT129_NetCore.Models.Api
                 {
                     SqlCommand cmd = new SqlCommand(@"
 SELECT
-	IDBUOI,
-	LOAI_BUOI,
+	IDBUOI                                                 MaBuoi,
+	LOAI_BUOI                                              LoaiBuoi,
 	CONVERT(varchar(20), HDTN.NGAYBATDAUDIEMDANH, 105)     ThoiGianBatDau,
 	CONVERT(varchar(20), HDTN.NGAYKETTHUCDIEnDANH, 105)    ThoiGianKetThuc
 FROM HOATDONGTHEONGAY HDTN
