@@ -23,13 +23,26 @@ namespace CNTT129_NetCore.Areas.Api
             }));
         }
 
-        // GET: <api>/<version>/<HoatDongController>
+        // GET: <api>/<version>/<HoatDongController>/danhsachbuoi
+        [HttpGet]
+        [Authorize]
+        [Route("DanhSachBuoi")]
+        public IActionResult GetDanhSachBuoi([FromQuery] int maHoatDong)
+        {
+            List<BuoiDiemDanhModel> danhSachBuoiDiemDanh = BuoiDiemDanhModel.GetDanhSachBuoi(maHoatDong);
+            return Ok(JsonSerializer.Serialize<dynamic>(new
+            {
+                danh_sach_buoi = danhSachBuoiDiemDanh
+            }));
+        }
+
+        // GET: <api>/<version>/<HoatDongController>/danhsachsinhVien
         [HttpGet]
         [Authorize]
         [Route("DanhSachSinhVien")]
-        public IActionResult GetDanhSachSinhVien([FromQuery] int maHoatDong)
+        public IActionResult GetDanhSachSinhVien([FromQuery] int maBuoiHoatDong)
         {
-            List<SinhVienModel> danhSachSinhVien = SinhVienModel.GetDanhSachSinhVien(maHoatDong);
+            List<SinhVienModel> danhSachSinhVien = SinhVienModel.GetDanhSachSinhVien(maBuoiHoatDong);
             return Ok(JsonSerializer.Serialize<dynamic>(new
             {
                 danh_sach_sinh_vien = danhSachSinhVien

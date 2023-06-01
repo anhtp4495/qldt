@@ -52,5 +52,16 @@ namespace CNTT129_NetCore.Extensions
             catch { }
             return new List<string>();
         }
+
+        public static string ConvertLoai2TenBuoi(this int loai)
+        {
+            switch (loai)
+            {
+                case 1: return "Sáng (7h-11h)";
+                case 2: return "Chiều (13h-17h)";
+                case 3: return "Tối (18h-22h)";
+                default: return "Cả ngày";
+            }
+        }
     }
 }
