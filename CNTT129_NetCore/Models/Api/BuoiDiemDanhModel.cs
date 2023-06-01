@@ -13,7 +13,7 @@ namespace CNTT129_NetCore.Models.Api
     public class BuoiDiemDanhModel
     {
         public string MaHoatDong      { get; set; } = string.Empty;
-        public string MaBuoi          { get; set; } = string.Empty;
+        public int    MaBuoi          { get; set; } = 0;
         public int    LoaiBuoi        { get; set; } = 0;
         public string TenBuoi         { get; set; } = string.Empty;
         public string ThoiGianBatDau  { get; set; } = string.Empty;
@@ -47,7 +47,7 @@ ORDER BY NGAYBATDAUDIEMDANH, LOAI_BUOI", con);
                         danhSachSinhVien.Add(new BuoiDiemDanhModel
                         {
                             MaHoatDong      = dr.GetStringOrDefault("MaHoatDong"),
-                            MaBuoi          = dr.GetStringOrDefault("MaBuoi"),
+                            MaBuoi          = dr.GetInt32OrDefault("MaBuoi"),
                             LoaiBuoi        = dr.GetInt32OrDefault("LoaiBuoi"),
                             TenBuoi         = dr.GetInt32OrDefault("LoaiBuoi").ConvertLoai2TenBuoi(),
                             ThoiGianBatDau  = dr.GetStringOrDefault("ThoiGianBatDau"),
@@ -92,7 +92,7 @@ ORDER BY NGAYBATDAUDIEMDANH, LOAI_BUOI", con);
                         danhSachSinhVien.Add(new BuoiDiemDanhModel
                         {
                             MaHoatDong      = dr.GetStringOrDefault("MaHoatDong"),
-                            MaBuoi          = dr.GetStringOrDefault("MaBuoi"),
+                            MaBuoi          = dr.GetInt32OrDefault("MaBuoi"),
                             LoaiBuoi        = dr.GetInt32OrDefault("LoaiBuoi"),
                             TenBuoi         = dr.GetInt32OrDefault("LoaiBuoi").ConvertLoai2TenBuoi(),
                             ThoiGianBatDau  = dr.GetStringOrDefault("ThoiGianBatDau"),
