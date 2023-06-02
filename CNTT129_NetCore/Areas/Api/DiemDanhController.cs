@@ -20,7 +20,7 @@ namespace CNTT129_NetCore.Areas.Api
             {
                 return Ok(JsonSerializer.Serialize<dynamic>(new
                 {
-                    trang_thai = "Điểm danh thành công!",
+                    message = "Điểm danh thành công!",
                 }));
             }
 
