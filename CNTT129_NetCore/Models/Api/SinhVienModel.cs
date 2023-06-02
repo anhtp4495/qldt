@@ -70,7 +70,7 @@ SELECT
     SINHVIEN.MASV,
     @maThietBi
 FROM SINHVIEN
-WHERE SINHVIEN.MASV = @maSV", con);
+WHERE RTRIM(SINHVIEN.MASV) = @maSV", con);
                     cmdInsert.CommandType = CommandType.Text;
                     cmdInsert.Parameters.Add(new SqlParameter("maThietBi", model.DanhSachThietBi[0]));
                     cmdInsert.Parameters.Add(new SqlParameter("maSV", model.MaSinhVien));
