@@ -46,7 +46,7 @@ namespace CNTT129_NetCore.Extensions
                 if (!dr.IsDBNull(name))
                 {
                     string str = dr.GetString(name);
-                    return str.Split(new[] { ',' }).ToList();
+                    return str.Split(new[] { ',' }).Select(s => s.TrimStart()).ToList();
                 }
             }
             catch { }

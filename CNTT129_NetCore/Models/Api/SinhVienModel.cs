@@ -56,5 +56,62 @@ GROUP BY SINHVIEN.MASV, SINHVIEN.TENSV", con);
             }
             return danhSachSinhVien;
         }
+        
+        public static SinhVienModel UpdateThietBi(SinhVienModel model)
+        {
+            SinhVienModel sv = null;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(AppSettings.ConnectionString))
+                {
+                    SqlCommand cmdInsert = new SqlCommand(@"
+INSERT INTO THIETBI_SINHVIEN(MASV, MATHIETBI)
+SELECT
+    SINHVIEN.MASV,
+    @maThietBi
+FROM SINHVIEN
+WHERE SINHVIEN.MASV = @maSV", con);
+                    cmdInsert.CommandType = CommandType.Text;
+                    cmdInsert.Parameters.Add(new SqlParameter("maThietBi", model.DanhSachThietBi[0]));
+                    cmdInsert.Parameters.Add(new SqlParameter("maSV", model.MaSinhVien));
+
+                    SqlCommand cmdSelect = new SqlCommand(@"
+SELECT
+	SINHVIEN.MASV                                   MaSinhVien,
+    SINHVIEN.TENSV                                  TenSinhVien,
+    STRING_AGG(TB.MATHIETBI, ', ') as               DanhSachThietBi
+FROM SINHVIEN
+LEFT JOIN THIETBI_SINHVIEN TB
+ON SINHVIEN.MASV = TB.MASV
+WHERE SINHVIEN.MASV = @maSV
+GROUP BY SINHVIEN.MASV, SINHVIEN.TENSV", con);
+                    cmdSelect.Parameters.Add(new SqlParameter("maSV", model.MaSinhVien));
+                    cmdSelect.CommandType = CommandType.Text;
+
+                    con.Open();
+
+                    try
+                    {
+                        cmdInsert.ExecuteScalar();
+                    }
+                    catch { }
+
+                    SqlDataReader dr = cmdSelect.ExecuteReader();
+                    if (dr.Read())
+                    {
+                        sv = new SinhVienModel
+                        {
+                            MaSinhVien      = dr.GetStringOrDefault("MaSinhVien"),
+                            TenSinhVien     = dr.GetStringOrDefault("TenSinhVien"),
+                            DanhSachThietBi = dr.GetListStringOrDefault("DanhSachThietBi")
+                        };
+                    }
+                }
+            }
+            catch
+            {
+            }
+            return sv;
+        }
     }
 }
