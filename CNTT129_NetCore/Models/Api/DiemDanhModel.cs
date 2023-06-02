@@ -48,6 +48,7 @@ WHERE SINHVIEN.MASV = @maSV", con);
                             cmdInsert.Parameters.Add(new SqlParameter("idBuoi", model.Id));
                             cmdInsert.Parameters.Add(new SqlParameter("maSV", sv.MaSinhVien));
                             cmdInsert.Parameters.Add(new SqlParameter("ghiChu", string.Format("{0}", sv.DanhSachThietBi.Count > 0 ? sv.DanhSachThietBi[0]: "Không có thiết bị!")));
+                            cmdInsert.Parameters.Add(new SqlParameter("ngayDiemDanh", DateTime.Now.ToString("yyyy-MM-dd")));
                             cmdInsert.ExecuteScalar();
                         }
                     }
