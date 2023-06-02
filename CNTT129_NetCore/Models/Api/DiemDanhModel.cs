@@ -26,6 +26,11 @@ namespace CNTT129_NetCore.Models.Api
                     {
                         foreach (SinhVienModel sv in model.DanhSachSinhVien)
                         {
+                            if (string.IsNullOrEmpty(sv.MaSinhVien))
+                            {
+                                continue;
+                            }
+                            
                             SqlCommand cmdInsert = new SqlCommand(@"
 INSERT INTO DIEMDANH(ID_SV, MASV, SDT, EMAIL, GHICHU, NGAYDIEMDANH, TRANGTHAI, IDBUOI)
 SELECT
